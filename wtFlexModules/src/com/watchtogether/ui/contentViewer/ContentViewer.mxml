@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 xmlns:content="com.contentViewer"
+		 xmlns:contentViewer="com.watchtogether.ui.contentViewer.*"
+		 initialize="init(event)"
+		 creationComplete="creationCompleteHandler(event)"
+		 deactivate="stage_mouseLeave(event)">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.iface.media.SearchController;
+			import com.watchtogether.media.youtube.api.adobe.webapis.youtube.methodgroups.Users;
+			import com.watchtogether.ui.notification.NotificationPanel;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.modules.Module;
+			import mx.modules.ModuleLoader;
+			
+			import spark.components.Group;
+			import spark.primitives.Rect;
+			
+			private var blockHideBool:Boolean = false;
+			
+			private var _notification:NotificationPanel;
+			
+			[Bindable]
+			protected var _desktopId:int;
+			
+			[Bindable]
+			protected var userControlPanel:ContentUserControls;
+			[Bindable]
+			protected var displayInfoPanel:ContentInfo;
+			[Bindable]
+			protected var userControlAlpha:Number = 0;
+			
+			[Bindable]
+			protected var searchControlAlpha:Number = 0;
+			
+			[Bindable]
+			protected var contentSearchPanel:ContentSearch;
+			[Bindable]
+			protected var contentSearhAlpha:Number = 0;
+			[Bindable]
+			protected var tempContentSearchY:Number;
+			protected var contentSearchY:Number;
+			
+			[Bindable]
+			protected var contentViewer:Group;
+			
+			private var mediaViewerURL:String;
+			private var displayInfoURL:String;
+			private var userControlURL:String;
+			
+			private var mouseOverBounds:Group;
+			
+			private var _isSearchPanelShowing:Boolean = false;
+			private var isUserControlsLoaded:Boolean = false;
+			private var isDisplayInfoLoaded:Boolean = false;
+			private var isContentViewerLoaded:Boolean = false;
+			
+			private var firstTimeLoad:Boolean = true;
+			
+			// ----------------------- Event Listeners ----------------------- //
+
+			public function get desktopId():int
+			{
+				return _desktopId;
+			}
+			
+			public function set desktopId(deskId:int):void
+			{
+				_desktopId = deskId;
+			}
+			
+			public function get notification():NotificationPanel
+			{
+				return _notification;
+			}
+
+			public function get isSearchPanelShowing():Boolean
+			{
+				return _isSearchPanelShowing;
+			}
+
+			private function init(event:Event):void
+			{
+				event.stopPropagation();
+			
+				mouseOverBounds = new Group();
+				mouseOverBounds.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+				mouseOverBounds.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+				mouseOverBounds.alpha = 0;
+				mouseOverBounds.top = 0;
+				mouseOverBounds.left = 0;
+				this.addElement(mouseOverBounds);
+				
+				// fist layer, the content viewer
+				contentViewer = new Group;
+				contentViewer.top = 0;
+				contentViewer.left = 0;
+				this.addElement(contentViewer);
+				
+				// second layer, user controls
+				displayInfoPanel = new ContentInfo();
+				displayInfoPanel.height = 20;
+				displayInfoPanel.width = 424;
+				displayInfoPanel.alpha = userControlAlpha;
+				displayInfoPanel.visible = false;
+				this.addElement(displayInfoPanel);
+				
+				// second layer, user controls
+				userControlPanel = new ContentUserControls();
+				userControlPanel.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+				userControlPanel.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+				userControlPanel.height = 107;
+				userControlPanel.width = width;
+				userControlPanel.alpha = userControlAlpha;
+				userControlPanel.visible = false;
+				this.addElement(userControlPanel);
+				
+				_notification = new NotificationPanel();
+				this.addElement(notification);
+				
+				// third layer, search panel
+				contentSearchPanel = new ContentSearch();
+				contentSearchPanel.height = 342;
+				contentSearchPanel.width = 608;
+				contentSearchPanel.alpha = contentSearhAlpha;
+				
+				contentSearchPanel.addEventListener(MouseEvent.MOUSE_OUT, searchMouseOutHandler);
+				contentSearchPanel.addEventListener(MouseEvent.MOUSE_OVER, searchMouseOverHandler);
+				this.addElement(contentSearchPanel);
+			}
+			
+			private function stage_mouseLeave(event:Event):void {
+				var cont:SearchController = null;
+				
+				if (getContentSearchModule() != null && (getContentSearchModule().child as Object)!=null)
+					cont = (getContentSearchModule().child as Object).controller as SearchController;
+				
+				if (cont != null && cont.allowedSearchOutHide()) {
+					hideSearchPanelForced();
+					userControlAlpha = 0;
+					this.userControlsShow.play();
+					this.displayInfoShow.play();
+				}
+			} 
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				setSizes();
+			}
+			
+			public function setSizes():void {
+				contentViewer.height = this.height;
+				contentViewer.percentWidth = 100;
+				
+				_notification.width = 0;
+				_notification.height = 0;
+				_notification.x = this.width - 410;
+				_notification.invalidateDisplayList();
+				
+				mouseOverBounds.height = this.height;
+				mouseOverBounds.percentWidth = 100;
+				
+				// second layer, user controls
+				displayInfoPanel.horizontalCenter = 0;
+				displayInfoPanel.y = 0;
+				
+				// second layer, user controls
+				userControlPanel.horizontalCenter = 0;
+				userControlPanel.y = this.height - 109;
+				
+				// third layer, search panel
+				contentSearchPanel.horizontalCenter = 0;
+				
+				contentSearchY = this.height - 344;
+				tempContentSearchY = this.height;
+				contentSearchPanel.y = tempContentSearchY;
+			}
+			
+			public function moveForResize():void {
+				userControlPanel.y = this.height - userControlPanel.height;
+				mouseOverBounds.height = this.height;
+				
+				if (contentSearchPanel.visible == true)
+					contentSearchPanel.visible = false;
+				else
+					contentSearchPanel.visible = true;
+				
+				//Hide the user controls
+				if (mouseY > this.height) {
+					userControlAlpha = 0;
+					this.userControlsShow.play();
+					this.displayInfoShow.play();
+				}
+				
+				this.validateDisplayList();
+			}
+			
+			/**
+			 * Displays the user controls on mouse over envent.
+			 */
+			protected function mouseOverHandler(event:MouseEvent):void
+			{
+				// Stop the propagation of the event
+				event.stopPropagation();
+				if(!isSearchPanelShowing && isUserControlsLoaded)
+				{
+					// Show user controls
+					userControlAlpha = 1;
+					this.userControlsShow.play();
+					this.displayInfoShow.play();
+				}
+			}
+
+			/**
+			 * Hides the user controls on mouse out event.
+			 */
+			protected function mouseOutHandler(event:MouseEvent):void
+			{
+				if (event.relatedObject != null &&
+					event.relatedObject.toString().indexOf('[object')==-1 &&
+					event.relatedObject.toString().indexOf('FlickrViewer')==-1 &&
+					event.relatedObject.toString().indexOf('ContentUserControlsSkin')==-1) {
+					
+					// Stop the propagation of the event
+					event.stopPropagation();
+					if(!isSearchPanelShowing)
+					{
+						// Hide user controls and search
+						userControlAlpha = 0;
+						this.userControlsShow.play();
+						this.displayInfoShow.play();
+					}
+					/*else
+					{
+						hideSearchPanel();
+					}*/
+				}
+			}
+			
+			protected function searchMouseOutHandler(event:MouseEvent):void
+			{
+				var cont:SearchController = null;
+				
+				if (getContentSearchModule() != null && (getContentSearchModule().child as Object)!=null)
+					cont = (getContentSearchModule().child as Object).controller as SearchController;
+				
+				if (cont != null && cont.allowedSearchOutHide()&& (event.relatedObject == null || 
+					(event.relatedObject.toString().indexOf("ContentSearch") == -1 &&
+						event.relatedObject.toString().indexOf("dropDown") == -1 &&
+						event.relatedObject.toString().indexOf("[object TextLine]")== -1))) {
+					blockHideBool = false;
+					searchControlsHide.play();
+				}
+			}
+			
+			protected function searchMouseOverHandler(event:MouseEvent):void
+			{
+				if (event.relatedObject != null && 
+					(event.relatedObject.toString().indexOf("ContentSearch") != -1 ||
+						event.relatedObject.toString().indexOf("dropDown") != -1 ||
+						event.relatedObject.toString().indexOf("[object TextLine]") != -1)) {
+					searchControlsHide.stop();
+					if (!contentSearchShow.isPlaying)
+						contentSearchPanel.alpha = 1;
+				}
+			}
+
+			// --------------- Search Panel Functions -------------- //
+			/**
+			 * Displays the search panel with specified SWF module.
+			 */
+			public function showSearchPanel(swfModule:ModuleLoader):void
+			{
+				if (firstTimeLoad) {
+					var app:main = (FlexGlobals.topLevelApplication as main);
+					
+					app.stage.addEventListener(Event.MOUSE_LEAVE, stage_mouseLeave);
+					
+					firstTimeLoad = false;
+				}
+				// is there something on the content search panel
+				if(!isSearchPanelShowing){ // no
+					// load module
+					contentSearchShow.end();
+					searchControlsHide.stop();
+					
+					swfModule.verticalCenter = 0;
+					swfModule.horizontalCenter = 0;
+					contentSearchPanel.addElement(swfModule);
+					
+					
+					var obj:Object = (contentSearchPanel.getElementAt(0) as ModuleLoader).child as Object;
+					
+					if (obj != null && obj.hasOwnProperty("controller"))
+						(obj.controller as SearchController).giveFocus();
+					
+					// show the panel
+					contentSearhAlpha = 1;
+					tempContentSearchY = contentSearchY;
+					contentSearchShow.play();
+					_isSearchPanelShowing = true;
+					blockHideBool = false;
+				}
+				else // already showing something
+				{
+					var currantChild:ModuleLoader = 
+						(contentSearchPanel.getElementAt(0) as ModuleLoader);
+					if(currantChild.url == swfModule.url) // same path
+					{
+						hideSearchPanelForced(); // remove it
+					}
+					else // different path
+					{
+						hideSearchPanelForced(); // remove it
+						showSearchPanel(swfModule); // replace with new panel
+					}
+				}
+			}
+			
+			/**
+			 * Displays the search panel with specified SWF module.
+			 */
+			public function hideSearchPanel():void
+			{
+				var cont:SearchController = null;
+				
+				if (getContentSearchModule() != null && (getContentSearchModule().child as Object)!=null)
+					cont = (getContentSearchModule().child as Object).controller as SearchController;
+				
+				if (contentSearchPanel.alpha == 0) {
+					contentSearchPanel.y = this.height;
+					_isSearchPanelShowing = false;
+				}
+				
+				if (cont != null && cont.allowedHide() && !blockHideBool) {
+					hideSearchPanelForced();
+				}
+			}
+			
+			/**
+			 * Displays the search panel with specified SWF module.
+			 */
+			public function hideSearchPanelForced():void
+			{
+
+				// hide the panel
+				contentSearhAlpha = 0;
+				tempContentSearchY = this.height;
+				contentSearchShow.suspendBackgroundProcessing = true;
+				contentSearchShow.play();
+				this.setFocus();
+
+				_isSearchPanelShowing = false;
+				// remove modlue
+				contentSearchPanel.removeAllElements();
+			}
+			
+			/**
+			 * Returns the module loader (SWF) of the search panel,
+			 * for inter-module communication.
+			 * If there is none loaded return false.
+			 */
+			public function getContentSearchModule():ModuleLoader
+			{
+				if(isSearchPanelShowing)
+				{
+					return contentSearchPanel.getElementAt(0) as ModuleLoader;
+				}
+				// else return a null object
+				return null;
+			}
+			
+			// ----------------- User Controls Functions ------------------- //
+			/**
+			 * Sets the user controls for the content viewer.
+			 */
+			public function setUserControls(swfUserControlsPath:String):void
+			{
+				this.userControlURL = swfUserControlsPath;
+			}
+			
+			public function loadUserControls():void {
+				if(isUserControlsLoaded)
+				{
+					removeUserControls();
+				}
+				var controls:ModuleLoader = new ModuleLoader();
+				controls.url = userControlURL;
+				userControlPanel.addElement(controls);
+				userControlPanel.visible = true;
+				isUserControlsLoaded = true;
+			}
+			
+			public function loadOldUserControls(moduleLoader:ModuleLoader):void {
+				removeUserControls();
+				userControlPanel.addElement(moduleLoader);
+				userControlPanel.visible = true;
+				isUserControlsLoaded = true;
+			}
+			
+			public function setMediaInfo(swfMediaInfoPath:String):void
+			{
+				this.displayInfoURL = swfMediaInfoPath;
+			}
+			
+			public function loadMediaInfo():void {
+				
+				if(isDisplayInfoLoaded)
+				{
+					removeDisplayInfo();
+				}
+				var infoModule:ModuleLoader = new ModuleLoader();
+				infoModule.url = displayInfoURL;
+				displayInfoPanel.addElement(infoModule);
+				displayInfoPanel.visible = true;
+				isDisplayInfoLoaded = true;
+			}
+			
+			public function loadOldMediaInfo(infoModule:ModuleLoader):void {
+				removeDisplayInfo();
+				displayInfoPanel.addElement(infoModule);
+				displayInfoPanel.visible = true;
+				isDisplayInfoLoaded = true;
+			}
+			
+			public function removeDisplayInfo():void
+			{
+				if(isDisplayInfoLoaded)
+				{
+					//(displayInfoPanel.getElementAt(0) as ModuleLoader).unloadModule();
+					displayInfoPanel.removeAllElements();
+					isDisplayInfoLoaded = false;
+				}
+			}
+			
+			/**
+			 * Removes the user controls module from panel.
+			 */
+			public function removeUserControls():void
+			{
+				if(isUserControlsLoaded)
+				{
+					//(userControlPanel.getElementAt(0) as ModuleLoader).unloadModule();
+					userControlPanel.removeAllElements();
+					isUserControlsLoaded = false;
+				}
+			}
+			
+			// -------------------- Content Viewer Functions ---------------- //
+			/**
+			 * Adds a specific media viewer.
+			 */
+			public function setMediaViewer(swfPath:String):void
+			{
+				this.mediaViewerURL = swfPath;
+				
+			}
+			
+			public function getMediaViewerURL():String
+			{
+				return this.mediaViewerURL;
+			}
+
+			public function getDisplayInfoURL():String
+			{
+				return this.displayInfoURL;
+			}
+			
+			public function getDisplayInfo():ModuleLoader
+			{
+				if(isDisplayInfoLoaded)
+				{
+					return displayInfoPanel.getElementAt(0) as ModuleLoader;
+				}
+				return null;
+			}
+
+			
+			public function getUserControlURL():String
+			{
+				return this.userControlURL;
+				
+			}
+			
+			public function loadMediaViewer():void {
+				startupImage.visible = false;
+				if(isContentViewerLoaded)
+				{
+					removeMediaViewer();
+				}
+				
+				var viewer:ModuleLoader = new ModuleLoader();
+				viewer.url = mediaViewerURL;
+				viewer.horizontalCenter = 0.0;
+				viewer.verticalCenter = 0.0;
+				contentViewer.addElement(viewer);
+				isContentViewerLoaded = true;
+			}
+			
+			public function loadOldMediaViewer(viewer:ModuleLoader):void {
+				removeMediaViewer();
+				contentViewer.addElement(viewer);
+				isContentViewerLoaded = true;
+			}
+			
+			 /**
+			 * Removes the media viewer.
+			 */
+			public function removeMediaViewer():void
+			{
+				if(isContentViewerLoaded)
+				{
+					//(contentViewer.getElementAt(0) as ModuleLoader).unloadModule();
+					
+					contentViewer.removeAllElements();
+					isContentViewerLoaded = false;
+				}
+			}
+			 /**
+			 * Retrives the media viewer for inter-module communication.
+			 * If no viewer was loaded, return null.
+			 */
+			public function getMediaViewer():ModuleLoader
+			{
+				if(isContentViewerLoaded)
+				{
+					return contentViewer.getElementAt(0) as ModuleLoader;
+				}
+				return null;
+			}
+			
+			/**
+			 * Retrives the user control for inter-module communication.
+			 * If no  user control was loaded, return null.
+			 */
+			public function getUserControl():ModuleLoader
+			{
+				if(isUserControlsLoaded)
+				{
+					return userControlPanel.getElementAt(0) as ModuleLoader;
+				}
+				return null;
+			}
+
+			private function blockHide():void {
+				blockHideBool = true;
+			}
+			
+			public function changeUserControlLookAndFeel(bgAlpha:Number, borderAlpha:Number, width:Number, height:Number):void {
+				userControlPanel.bgAlpha = bgAlpha;
+				userControlPanel.borderAlpha = borderAlpha;
+				userControlPanel.width = width;
+				userControlPanel.height = height;
+				userControlPanel.y = this.height - height;
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Fade id="userControlsShow" target="{userControlPanel}" alphaTo="{userControlAlpha}"/>
+		<s:Fade id="displayInfoShow" target="{displayInfoPanel}" alphaTo="{userControlAlpha}"/>
+		<s:Fade id="searchControlsHide" target="{contentSearchPanel}" alphaTo="{0}" duration="750" effectStop="blockHide()" effectEnd="hideSearchPanel()"/>
+		<s:Parallel id="contentSearchShow">
+			<s:Fade target="{contentSearchPanel}" alphaTo="{contentSearhAlpha}" startDelay="150"/>
+			<s:Move target="{contentSearchPanel}" yTo="{tempContentSearchY}"/>
+		</s:Parallel>
+	</fx:Declarations>
+	<s:BitmapImage id="startupImage" verticalCenter="0" horizontalCenter="0" source="@Embed('com/watchtogether/ui/contentViewer/icon/mgestykOnWT.png')" />
+</s:SkinnableContainer>

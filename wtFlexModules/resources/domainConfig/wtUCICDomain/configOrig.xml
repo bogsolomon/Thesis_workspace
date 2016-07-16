@@ -1,0 +1,38 @@
+ <?xml version="1.0" encoding="utf-8"?>
+<config>
+	<server url="rtmp://wtsrv1-rtmp.watch-together.com:1939/wtRed5_head" loadbalancer="false"/>
+	<proxy url="http://wtsrv1.watch-together.com/proxy/proxy?url="/>
+	<fileServer downloadUrl="http://wtsrv1.watch-together.com/uploadServlet/download?file="
+		uploadUrl="http://wtsrv1.watch-together.com/uploadServlet/upload"/>
+	<domainLogin module="WTUCICLoginModule">
+	</domainLogin>
+	<flashVars module="WTUCICFVModule"/>
+	<userlist module="WTUCICUserList"/>
+	<chat module="ChatViewer"/>
+	<settings module="SettingsViewer"/>
+	<components>
+		<component name="Flickr" 
+				icon="com/watchtogether/ui/dockBar/icons/flickr-icon-rfx.png" 
+				searchModule="com/watchtogether/media/flickr/FlickrSearch.swf" 
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+				
+		<component name="Youtube"
+				icon="com/watchtogether/ui/dockBar/icons/youtube-icon-rfx.png" 
+				searchModule="com/watchtogether/media/youtube/YoutubeSearch.swf" 
+				userControlModule="com/watchtogether/media/youtube/YoutubeUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/youtube/YoutubeViewer.swf"/>	
+				
+		<component name="Docs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/doc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/doc/DocsUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/doc/DocsViewer.swf"/>
+				
+		<component name="WTDocs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/wtdoc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/wtdoc/DocsUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/wtdoc/DocsViewer.swf"/>
+	</components>
+</config>

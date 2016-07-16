@@ -1,0 +1,44 @@
+ <?xml version="1.0" encoding="utf-8"?>
+<config>
+	<server url="rtmp://wtsrv1-rtmp.watch-together.com:1939/wtRed5_head"/>
+	<proxy url="http://wtsrv1.watch-together.com/proxy/proxy?url="/>
+	<fileServer downloadUrl="http://wtsrv1.watch-together.com/uploadServlet/download?file="
+		uploadUrl="http://wtsrv1.watch-together.com/uploadServlet/upload"/>
+	<domainLogin module="FacebookLoginModule">
+		<params>
+			<secretKey value="092f05c06b12305a6e8a3076edc2eb3e"/>
+		</params>	
+	</domainLogin>
+	<flashVars module="FacebookFVModule"/>
+	<userlist module="FacebookUserListModule"/>
+	<chat module="ChatViewer"/>
+	<settings module="SettingsViewer"/>
+	<maps>
+		<key value="ABQIAAAAnvrTFygj6CR_Uw5hlCD-IxR5Z53riCXn0USLxCHpL66XJ2VWHRSWFc-UcZiMp0luIvYSoNK719Cj-A"/>
+	</maps>
+	<components>
+		<component name="Flickr" 
+				icon="com/watchtogether/ui/dockBar/icons/flickr-icon-rfx.png" 
+				searchModule="com/watchtogether/media/flickr/FlickrSearch.swf" 
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+		
+		<component name="Youtube" 
+				icon="com/watchtogether/ui/dockBar/icons/youtube-icon-rfx.png" 
+				searchModule="com/watchtogether/media/youtube/YoutubeSearch.swf" 
+				userControlModule="com/watchtogether/media/youtube/YoutubeUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/youtube/YoutubeViewer.swf"/>
+					
+		<component name="WTDocs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/wtdoc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/wtdoc/DocsUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/wtdoc/DocsViewer.swf"/>
+						
+		<component name="FbPhoto"
+				icon="com/watchtogether/ui/dockBar/icons/facebook-photo-icon-rfx.png"
+				searchModule="/com/watchtogether/code/facebookDomain/photoAlbum/FacebookAlbumSearch.swf"
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+	</components>
+</config>

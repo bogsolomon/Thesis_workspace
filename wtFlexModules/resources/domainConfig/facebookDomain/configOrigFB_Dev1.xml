@@ -1,0 +1,51 @@
+ <?xml version="1.0" encoding="utf-8"?>
+<config>
+	<server url="rtmp://wtsrv1-rtmp.watch-together.com:1939/wtRed5_dev1"/>
+	<proxy url="http://wtsrv1.watch-together.com/proxy/proxy?url="/>
+	<fileServer downloadUrl="http://wtsrv1.watch-together.com/uploadServlet/download?file="
+		uploadUrl="http://wtsrv1.watch-together.com/uploadServlet/upload"/>
+	<domainLogin module="FacebookLoginModule">
+		<params>
+			<secretKey value="b0c78908fe305af93b5924dd27672e18"/>
+		</params>	
+	</domainLogin>
+	<flashVars module="FacebookFVModule"/>
+	<userlist module="FacebookUserListModule"/>
+	<chat module="ChatViewer"/>
+	<settings module="SettingsViewer"/>
+	<components>
+		<component name="Flickr" 
+				icon="com/watchtogether/ui/dockBar/icons/flickr-icon-rfx.png" 
+				searchModule="com/watchtogether/media/flickr/FlickrSearch.swf" 
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+		
+		<component name="Youtube" 
+				icon="com/watchtogether/ui/dockBar/icons/youtube-icon-rfx.png" 
+				searchModule="com/watchtogether/media/youtube/YoutubeSearch.swf" 
+				userControlModule="com/watchtogether/media/youtube/YoutubeUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/youtube/YoutubeViewer.swf"/>
+					
+		<component name="WTDocs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/doc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/doc/DocsUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/doc/DocsViewer.swf"/>
+				
+		<component name="FbPhoto"
+				icon="com/watchtogether/ui/dockBar/icons/facebook-photo-icon-rfx.png"
+				searchModule="/com/watchtogether/code/facebookDomain/photoAlbum/FacebookAlbumSearch.swf"
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+		
+		<component name="TrendRT" 
+				icon="com/watchtogether/ui/dockBar/icons/trendrt-icon-rfx.png"
+				searchModule="com/watchtogether/media/trendRT/TrendRTSearchModule.swf"
+				mediaViewerModule="com/watchtogether/media/twitter/TwitterViewerModule.swf"/>
+		
+		<component name="Twitter" 
+				icon="com/watchtogether/ui/dockBar/icons/twitter-icon-rfx.png"
+				searchModule="com/watchtogether/media/twitter/TwitterSearchModule.swf"
+				mediaViewerModule="com/watchtogether/media/twitter/TwitterViewerModule.swf"/>
+	</components>
+</config>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domains>
+	<domain>
+		<url>http://wtsrv1.watch-together.com/wtLogin</url>
+		<type>wtStandaloneDomain</type>
+	</domain>
+	<domain>
+		<url>http://wtsrv1.watch-together.com/wtDemo</url>
+		<type>wtStandaloneDomainDemo</type>
+	</domain>
+	<domain>
+		<url>http://wtsrv1.watch-together.com/fbapp</url>
+		<type>facebookConnectDomain</type>
+	</domain>
+	<domain>
+		<url>http://wtsrv1.watch-together.com/trendrt/</url>
+		<type>trendrtDomain</type>
+	</domain>
+	<domain>
+		<url>https://course.ncct.uottawa.ca/</url>
+		<type>courseDomain</type>
+	</domain>
+	<domain>
+		<url>http://wtsrv1.watch-together.com/wtMeeting</url>
+		<type>meetingDomain</type>
+	</domain>
+	<domain>
+		<url>http://192.168.32.23</url>
+		<type>courseDomain</type>
+	</domain>
+	
+	<!--Always keep this last -->
+	<domain>
+		<url></url>
+		<type>facebookDomain</type>
+	</domain>
+</domains>

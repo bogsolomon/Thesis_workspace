@@ -1,0 +1,19 @@
+create database wtc_${wt_version}; 
+connect wtc_${wt_version};
+
+CREATE TABLE APPLICATION_USERS (
+  user_id varchar(64) NOT NULL,
+  PRIMARY KEY  (user_id)
+) ENGINE=InnoDB;
+
+create table APPLICATION_USER_DOCUMENTS ( 
+	user_id varchar(64) NOT NULL default '', 
+	file_path varchar(300) NOT NULL default '', 
+	file_description varchar(600), 
+	file_status varchar(64), 
+	width int(11), 
+	height int(11), 
+	privacy_view int(2),
+	PRIMARY KEY  (file_path), 
+	CONSTRAINT  FOREIGN KEY (user_id) REFERENCES APPLICATION_USERS (user_id)) 
+ENGINE=InnoDB;

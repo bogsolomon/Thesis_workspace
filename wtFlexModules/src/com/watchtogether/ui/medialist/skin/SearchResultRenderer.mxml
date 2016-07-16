@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer 
+  xmlns:fx="http://ns.adobe.com/mxml/2009" 
+  xmlns:s="library://ns.adobe.com/flex/spark" 
+  xmlns:mx="library://ns.adobe.com/flex/mx">
+      <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+        <s:State name="hovered" />
+        <s:State name="selected" />
+    </s:states>
+
+<s:Group
+	click="mouseClicked(event)"
+	doubleClickEnabled="false"
+	width="93" 
+	height="100" 
+	left="0" top="0"
+	creationComplete="startRendering()"
+	enabled="{_data.searchResultReady}">
+
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.ui.contentViewer.ContentViewer;
+			
+			import mx.managers.ToolTipManager;
+						
+			[Bindable]
+			private var initHeight:Number;
+			
+			[Bindable]																
+			private var _data:Object;			
+			
+			private function mouseClicked(event:MouseEvent):void {
+				var mainApp:main = this.parentApplication as main;
+				
+				for (var i:int=0;i<mainApp.numElements;i++) {
+					if (mainApp.getElementAt(i) is ContentViewer) {
+						(mainApp.getElementAt(i) as ContentViewer).hideSearchPanel();
+					}
+				}
+				
+				dispatchEvent(new MediaListClickEvent(MediaListClickEvent.ITEM_CLICK,true,false,_data));
+			}
+			
+			[Bindable]
+			override public function get data():Object{
+			
+				return _data;
+			}
+			
+			override public function set data( inObject:Object):void{
+				if (inObject){	
+					_data = inObject;
+				}
+			}
+
+			private function startRendering():void{
+				initHeight = height;
+				ToolTipManager.hideDelay = 3000;
+			}
+		]]>
+	</fx:Script>
+	<mx:Image 
+		width="85"
+		height="61"
+		id="ThumbNail" 		
+		source="{_data.thumbnailUrl}" 
+		toolTip="Title: {_data.title}"
+		horizontalAlign="center"
+		x="4"
+		trustContent="true" smoothBitmapContent="true">
+	</mx:Image>
+	
+	<s:RichText width="85" 
+				top="61"
+				id="progressMajor"
+				text="{_data.progressMajor}"
+				textAlign="right"
+				fontSize="10"
+				visible="{_data.displayProgress}"
+				color="{_data.progressMajorColor}"/>
+	
+	<s:RichText width="85" 
+				top="51"
+				id="progressMinor"
+				text="{_data.progressMinor}"
+				textAlign="right"
+				fontSize="10"
+				visible="{_data.displayProgress}"
+				color="{_data.progressMinorColor}"/>
+		
+	<s:RichText
+		width="85"
+		height="30" 
+		id="Label" 
+		fontSize="9" 
+		text="{_data.title}"
+		textAlign="center"
+		bottom="0"
+		x="4"/>
+
+</s:Group>
+</s:ItemRenderer>

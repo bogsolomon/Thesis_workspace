@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" 
+		   xmlns:controllers = "com.watchtogether.media.wtdoc.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   layout="absolute" width="596" height="334" 
+		   initialize="initializeHandler(event)"
+		   creationComplete="controller.init()"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<fx:Declarations>
+		<controllers:DocsSearchController id="controller" view="{this}"/>
+		<s:Button id="upload" label="Upload"
+				  click="{controller.browseAndUpload(event)}" />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.constants.DeploymentConstants;
+			import com.watchtogether.code.events.DocumentStatusChangedEvent;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.code.iface.media.Document;
+			
+			import mx.events.FlexEvent;
+			
+			import spark.components.DropDownList;
+			import spark.events.IndexChangeEvent;
+			import spark.events.TrackBaseEvent;
+			
+			public var searchTypeCombo:DropDownList;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				searchTypeCombo = new DropDownList();
+				searchTypeCombo.id = "searchTypeCombo";
+				searchTypeCombo.enabled = true;
+				searchTypeCombo.selectedIndex = 0;
+				searchTypeCombo.dataProvider = controller.searchTypeArray;
+				searchTypeCombo.width = 180;
+				searchTypeCombo.addEventListener(IndexChangeEvent.CHANGE, controller.searchTypeChanged);
+				mediaList.addExtraElement(searchTypeCombo);
+				mediaList.addExtraElement(upload);
+				if (DeploymentConstants.FILE_UPLOAD_URL == "") {
+					upload.enabled = false;
+				}
+				mediaList.list.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_DRAG, listDragStart);
+				mediaList.list.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_RELEASE, listDragComplete);
+			}
+			
+			private function listDragStart(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = false;
+			}
+			
+			private function listDragComplete(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = true;
+			}
+			
+			
+			protected function mediaListItemClickHandler(event:MediaListClickEvent):void
+			{
+				controller.loadDocument(event.selectedItem as Document);
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"/>
+	
+</mx:Module>

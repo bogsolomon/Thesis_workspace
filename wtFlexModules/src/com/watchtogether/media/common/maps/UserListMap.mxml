@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="100%">
+	<fx:Script>
+		<![CDATA[
+			import com.google.maps.LatLng;
+			import com.google.maps.Map;
+			import com.google.maps.MapEvent;
+			import com.google.maps.MapType;
+			import com.google.maps.overlays.Marker;
+			import com.google.maps.overlays.MarkerOptions;
+			import com.google.maps.styles.FillStyle;
+			import com.google.maps.styles.StrokeStyle;
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.iface.login.AbstractLocation;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.media.common.maps.constants.MapConstants;
+			import com.watchtogether.ui.userlist.UserListEvent;
+
+			[Bindable]
+			public var data:Object;
+			
+			private var markerA:Marker;
+			private var isVisible:Boolean = false;
+				
+			private function userListExpanded(evt:UserListEvent):void {
+				if (evt.userId == data.uid) {
+					isVisible = true;
+					if (!isNaN(data.current_location.lat as Number)) {
+						map.setCenter(new LatLng(data.current_location.lat, data.current_location.long), 
+							13, MapType.NORMAL_MAP_TYPE);
+						
+						markerA = new Marker(new LatLng(data.current_location.lat, data.current_location.long));
+						
+						map.addOverlay(markerA);
+					} else {
+						map.setCenter(new LatLng(MapConstants.USER_LIST_LATITUDE, MapConstants.USER_LIST_LONGITUDE), 
+							MapConstants.USER_LIST_ZOOM, MapType.NORMAL_MAP_TYPE);
+					}
+				}
+			}
+			
+			private function userListCollapsed(evt:UserListEvent):void {
+				if (evt.userId == data.uid || isVisible) {
+					isVisible = false;
+					if (!isNaN(data.current_location.lat as Number)) {
+						map.removeOverlay(markerA);
+						map.setCenter(new LatLng(MapConstants.USER_LIST_LATITUDE, MapConstants.USER_LIST_LONGITUDE), 
+							MapConstants.USER_LIST_ZOOM, MapType.NORMAL_MAP_TYPE);
+					}
+				}
+			}
+			
+			private function onMapReady(event:Event):void {
+				MainApplication.instance.dispatcher.addEventListener(UserListEvent.EXPAND_USER_ITEM, userListExpanded);
+				MainApplication.instance.dispatcher.addEventListener(UserListEvent.COLLAPSE_USER_ITEM, userListCollapsed);
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+<!--	<s:Label text="blah" />
+	<s:Label text="{((data as AbstractUser).current_location as AbstractLocation).city}"/>
+	<s:Label text="blah" />-->
+	
+	
+	<maps:Map xmlns:maps="com.google.maps.*" id="map" mapevent_mapready="onMapReady(event)" 
+			  width="100%" height="100%" key="{MapConstants.GOOGLE_MAPS_KEY}"/>
+</s:Group>

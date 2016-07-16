@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 height="128" mouseOut="onMouseOut(event)"
+		 skinClass="com.watchtogether.ui.dockBar.skin.DockBarSkin"
+		 textAlign="center">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.ui.dockBar.skin.DockBarElementSkin;
+			import com.watchtogether.ui.dockBar.skin.DockBarSkin;
+			
+			import flash.sampler.NewObjectSample;
+			
+			import spark.components.Group;
+			import spark.skins.spark.ApplicationSkin;
+			
+			//start as 7 - userlist, config, separator, chat, separatortwo, desktopchange
+			private var _size:Number = 6;
+			
+			public function get size():Number
+			{
+				return _size;
+			}
+
+			public function onMouseOut(event:MouseEvent):void
+			{
+				event.stopPropagation();
+				var relatedObject:Object = event.relatedObject;
+				if(!(relatedObject is DockBar || 
+					relatedObject is DockBarElement || 
+					relatedObject is DockBarSkin || 
+					relatedObject is DockBarElementSkin ||
+					relatedObject is DockSeparator))
+				{
+					/*var parentObj:Object = relatedObject.parent;
+					while(parentObj is Group) parentObj = parentObj.parent;
+					if(parentObj is DockBar) return;
+					if(parentObj is main) return;*/
+					var number:Number = event.localX;
+					for(var index:int = 0; index < this.numElements; index++)
+					{
+						var child:DockBarElement = this.getElementAt(index) as DockBarElement;
+						child.makeSizeSmall();
+						child.iconResize.stop();
+						child.iconResize.play();
+					}
+				}
+			}
+			
+			/**
+			 * Adds a new dock bar icon.
+			 */
+			public function addIcon(imagePath:String, searchPath:String,
+									userContorlsPath:String, displayInfoPath:String, mediaViewerPath:String):DockBarElement
+			{
+				var dockElement:DockBarElement = new DockBarElement();
+				dockElement.iconWidth = this.height;
+				dockElement.iconHeight = this.height * 1.25;
+				dockElement.iconSource = imagePath;
+				dockElement.searchModulePath = searchPath;
+				dockElement.userControlsModulePath = userContorlsPath;
+				dockElement.displayInfoModulePath = displayInfoPath;
+				dockElement.mediaViewerModulePath = mediaViewerPath;
+				
+				_size++;
+				
+				//always add them to the front of the list
+				this.addElementAt(dockElement, 0);
+				return dockElement;
+			}
+			
+			/**
+			 * Add a separator.
+			 */
+			public function addSeparator():void
+			{
+				var separator:DockSeparator = new DockSeparator();
+				separator.height = this.height * 0.75;
+				separator.width = this.height / 0.375;
+				this.addElement(separator);
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Rect width="100%" height="100%" x="0" y="0">
+		<s:fill>
+			<s:SolidColor color="#000000" alpha="0.1" />
+		</s:fill>
+	</s:Rect>
+</s:SkinnableContainer>

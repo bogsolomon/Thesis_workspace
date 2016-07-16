@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.watchtogether.ui.session.skin.SessionControls")]
+	</fx:Metadata>
+	<fx:Declarations>
+		<!-- Glow Fx Layer -->
+		<s:GlowFilter color="#FFFFFF" />
+	</fx:Declarations>
+	<!-- Skin States -->
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+	</s:states>
+	
+	<!-- Backgound Layer -->
+	<s:Rect top="0" bottom="0" left="0" right="0">
+
+	</s:Rect>
+	
+	<!-- Content Layer -->
+	<s:Group id="contentGroup" top="1" bottom="1" left="1" right="1"/>
+	
+</s:SparkSkin>

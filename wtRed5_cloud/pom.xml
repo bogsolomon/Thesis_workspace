@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.watchtogether</groupId>
+  <artifactId>wtRed5</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1</version>
+  <name>WatchTogetherServer</name> 
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    
+    <dependency>
+    	<groupId>mysql</groupId>
+    	<artifactId>mysql-connector-java</artifactId>
+    	<version>5.1.21</version>
+    </dependency>
+	<dependency>
+		<groupId>org.red5</groupId>
+		<artifactId>red5-server</artifactId>
+		<version>1.0.7-RELEASE</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.red5</groupId>
+		<artifactId>red5-client</artifactId>
+		<version>1.0.7-RELEASE</version>
+		<scope>provided</scope>
+	</dependency>
+	<!--  dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+		<version>1.6.1</version>
+		<scope>provided</scope>
+	</dependency-->
+  <dependency>
+	<groupId>org.jgroups</groupId>
+	<artifactId>jgroups</artifactId>
+	<version>3.6.9.Final</version>
+  </dependency>
+  <dependency>
+    <groupId>org.fusesource</groupId>
+    <artifactId>sigar</artifactId>
+    <version>1.6.4</version>
+</dependency>
+  <!--  dependency>
+      <groupId>org.hyperic</groupId>
+      <artifactId>sigar</artifactId>
+      <version>1.6.5.132</version>
+    </dependency-->
+    <!--  dependency>
+		<groupId>org.ow2.jonas.osgi</groupId>
+		<artifactId>javaee-api</artifactId>
+		<version>5.1.2</version>
+		<scope>provided</scope>
+	</dependency-->
+	
+	<!--  >dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-web</artifactId>
+		<version>3.1.1.RELEASE</version>
+		<scope>provided</scope>
+	</dependency-->
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+          	<phase>package</phase>
+            <configuration>
+              <tasks>
+				<copy file="target/${finalName}/WEB-INF/classes/logback.xml" tofile="target/${finalName}/WEB-INF/classes/logback-${finalName}.xml" overwrite="true" />
+				<delete file="target/${finalName}/WEB-INF/classes/logback.xml"/>
+				<delete includeEmptyDirs="true">
+					<fileset dir="target/${finalName}/META-INF"/>
+				</delete>
+				<delete file="target/${finalName}.war"/>
+				<mkdir dir="target/sqldesc"/>
+				<move todir="target/sqldesc">
+			        <fileset dir="target/${finalName}/WEB-INF/classes/" includes="*_dbdesign.txt"/>
+			    </move>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-war-plugin</artifactId>
+      	<version>2.0.2</version>
+      	<configuration>
+          <packagingExcludes>META-INF</packagingExcludes>
+          <archive><addMavenDescriptor>false</addMavenDescriptor></archive>
+          <webResources>
+          	<resource>
+				<directory>src/main/webapp</directory>
+				<filtering>true</filtering>
+          	</resource>
+          </webResources>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <finalName>wtRed5_${wt_version}</finalName>
+  </build>
+  <properties>
+  	<wt_version>cld</wt_version>
+  	<dbuser>wtRed5_dbadmin</dbuser>
+  	<dbpass>wtRed5p@ss</dbpass>
+  	<finalName>wtRed5_${wt_version}</finalName>
+  	<jgroups_host>172.30.3.1</jgroups_host>
+  	<mysql_host>cloud1</mysql_host>
+  </properties>
+</project>

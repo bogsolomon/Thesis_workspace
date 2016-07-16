@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="570" height="40"
+		   xmlns:controller="com.watchtogether.media.flickr.controller.*"
+		   xmlns:components="com.watchtogether.media.flickr.ui.slideshow.*"
+		   creationComplete="controller.init()"
+		   >
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:FlickrUserControlController id="controller" userControl="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	
+	<!--<components:Slideshow id="slideShow"
+						  width="100%" top="6" bottom="6"
+						  dataProvider="{controller.pictures}"
+						  currentIndex="{slideBar.selectedIndex}"  
+						  /> -->
+	<s:HGroup 
+		width="512" height="18" 
+		verticalCenter="0" horizontalCenter="22">
+<!--		<mx:Button id="maximizeSlideshow" label="{controller.maximizeText}" click="controller.maximizeButtonClick()" 
+				   height="15" width="38" fontSize="9" fillColors="[#A4A4A4, #252525]" x="172"/>-->
+		<!-- numSlides set from controller -->
+		<components:SlideBar id="slideBar" 
+							 numSlides="0" width="142" height="18" 
+							 verticalAlign="middle" horizontalGap="0" 
+							 paddingRight="4" slideClick="controller.sliderClick()"
+							 visible="false"/>
+		
+	
+	</s:HGroup>
+	<s:ToggleButton id="playPauseBtn" 
+					skinClass="spark.skins.spark.mediaClasses.normal.PlayPauseButtonSkin" 
+					focusIn="event.target.depth=1" focusOut="event.target.depth=0" 
+					click="controller.onPlayPauseChange()" x="8" verticalCenter="0"/>
+	
+	
+	
+</mx:Module>

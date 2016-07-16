@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:controller="com.watchtogether.code.facebookDomain.photoAlbum.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   layout="absolute" width="596" height="334"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off"
+		   initialize="init(event)"
+		   creationComplete="controller.initFacebookPhotoService()">
+	<fx:Declarations>
+		<controller:FacebookAlbumSearchController id="controller" view="{this}" contentViewer="{MainApplication.instance.localSelectedContentViewer}"/>
+		<s:Button id="backToMyPhotosButton" label="Back to my pictures"
+				  click="{controller.returnToMyPhotos(event)}" />
+		<s:Button id="backToAlbumButton" label="Back to albums"
+				  enabled="{!_isAlbumMode}" click="{controller.returnToAlbum(event)}" />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.ui.userlist.UserList;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			[Bindable]
+			private var _isAlbumMode:Boolean;
+			
+			[Bindable]
+			private var _userList:ArrayCollection;
+			
+			protected function init(event:FlexEvent):void{
+				_isAlbumMode = true
+				mediaList.addExtraElement(backToAlbumButton);
+				mediaList.addExtraElement(backToMyPhotosButton);
+				mediaList.searchLabelFunction = userListLabelFunction;
+				mediaList.searchFilterFunction = userListFilterByName;
+				duplicateUserList();
+			}
+			
+			protected function mediaListItemClickHandler(event:MediaListClickEvent):void
+			{
+				var data:Object = event.selectedItem;
+				controller.itemSelected(data, _isAlbumMode);
+				
+				if (_isAlbumMode)
+					_isAlbumMode = !_isAlbumMode;	
+			}
+			
+			private function duplicateUserList():void
+			{
+				_userList = new ArrayCollection();
+				var friends:Dictionary = MainApplication.instance.login.getFriendsDetailedInfo();
+				for each(var user:AbstractUser in friends)
+				{
+					_userList.addItem(user);
+				}
+				
+				mediaList.autoCompleteDataProvider = _userList;
+			}
+			
+			private function userListLabelFunction(item:Object):String
+			{
+				var data:AbstractUser = item as AbstractUser;
+				var out:String = data["first_name"] + " " + data["last_name"];
+				return out;
+			}
+			
+			private function userListFilterByName(user:AbstractUser):Boolean
+			{
+				var out:Boolean = false;
+				var _filterText:String = mediaList.searchInput.text.toLowerCase();
+				if(_filterText.length == 0) out = true;
+				var userLastName:String = user.last_name.toLowerCase();
+				var userFirstName:String = user.first_name.toLowerCase();
+				
+				if(userFirstName.search(_filterText) == 0) out = true;
+				if(userLastName.search(_filterText) == 0) out = true;
+				
+				if(!out)
+				{
+					var completeName:String = userFirstName + " " + userLastName;
+					if(completeName.search(_filterText) == 0) out = true;
+				}
+				
+				return out;
+			}
+			
+			// Getters and Setters ---------------------------------------------
+			public function get isAlbumMode():Boolean{
+				return _isAlbumMode;
+			}
+			
+			public function set isAlbumMode(value:Boolean):void{
+				_isAlbumMode = value;
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"
+						 sort="{UserList.userListSortByName()}" />
+	
+</mx:Module>

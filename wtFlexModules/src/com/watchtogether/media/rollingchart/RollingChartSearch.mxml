@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" 
+		   xmlns:controllers = "com.watchtogether.media.rollingchart.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   layout="absolute" width="596" height="334" 
+		   initialize="initializeHandler(event)"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<fx:Declarations>
+		<controllers:RollingChartSearchController id="controller" view="{this}"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.google.maps.Map;
+			import com.google.maps.MapEvent;
+			import com.google.maps.controls.MapTypeControl;
+			import com.google.maps.controls.PositionControl;
+			import com.google.maps.controls.ZoomControl;
+			import com.watchtogether.media.common.maps.constants.MapConstants;
+			
+			import mx.events.FlexEvent;
+			
+			public var map:Map;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				map = new Map();
+				map.addEventListener(MapEvent.MAP_READY, controller.onMapReady);
+				map.key = MapConstants.GOOGLE_MAPS_KEY;
+				map.percentHeight = 100;
+				map.percentWidth = 100;
+				map.id = "map";
+				
+				map.addControl(new ZoomControl());
+				map.addControl(new PositionControl());
+				map.addControl(new MapTypeControl());
+				
+				addElement(map);
+			}
+		]]>
+	</fx:Script>
+</mx:Module>

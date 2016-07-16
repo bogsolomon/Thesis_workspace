@@ -1,0 +1,75 @@
+ <?xml version="1.0" encoding="utf-8"?>
+<config>
+	<server url="rtmp://dwpsrv1:1935/wtRed5_dwp_app" loadbalancer="false"/>
+	<proxy url="http://wtsrv1.watch-together.com/proxy/proxy?url="/>
+	<fileServer downloadUrl="http://dwpsrv1:8080/uploadServlet/download?file="
+		uploadUrl="http://dwpsrv1:8080/uploadServlet/upload"/>
+	<domainLogin module="WTDWPLoginModule">
+		<params>
+			<serverURL value="http://dwpsrv1:8080/dwp_admin_pf"/>
+			<imageServerURL value="http://dwpsrv2/dwp_campus"/>
+		</params>	
+	</domainLogin>
+	<flashVars module="WTDWPFVModule"/>
+	<userlist module="WTDWPUserList">
+	</userlist>
+	<maps>
+		<key value="ABQIAAAAnvrTFygj6CR_Uw5hlCD-IxR5Z53riCXn0USLxCHpL66XJ2VWHRSWFc-UcZiMp0luIvYSoNK719Cj-A"/>
+	</maps>
+	<chat module="ChatViewer"/>
+	<settings module="SettingsViewer"/>
+	<meeting module="MeetingViewer" enabled="true"/>
+	<components>
+		<component name="Flickr" 
+				icon="com/watchtogether/ui/dockBar/icons/flickr-icon-rfx.png" 
+				searchModule="com/watchtogether/media/flickr/FlickrSearch.swf" 
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf"
+				displayInfoModule="com/watchtogether/media/flickr/FlickrDisplayInfo.swf"
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+				
+		<component name="Youtube"
+				icon="com/watchtogether/ui/dockBar/icons/youtube-icon-rfx.png" 
+				searchModule="com/watchtogether/media/youtube/YoutubeSearch.swf" 
+				userControlModule="com/watchtogether/media/youtube/YoutubeUserControl.swf" 
+				displayInfoModule="com/watchtogether/media/youtube/YoutubeVideoInfo.swf"
+				mediaViewerModule="com/watchtogether/media/youtube/YoutubeViewer.swf"/>	
+				
+		<component name="Twitter" 
+				icon="com/watchtogether/ui/dockBar/icons/twitter-icon-rfx.png"
+				searchModule="com/watchtogether/media/twitter/TwitterSearchModule.swf"
+				mediaViewerModule="com/watchtogether/media/twitter/TwitterViewerModule.swf"/>
+				
+		<component name="Docs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/wtdoc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/wtdoc/DocsUserControl.swf"
+				displayInfoModule="com/watchtogether/media/wtdoc/DocsDisplayInfo.swf" 
+				mediaViewerModule="com/watchtogether/media/wtdoc/DocsViewer.swf"/>
+				
+		<component name="Ustream"
+				icon="com/watchtogether/ui/dockBar/icons/ustream_icon.png" 
+				searchModule="com/watchtogether/media/ustream/UstreamSearch.swf" 
+				userControlModule="com/watchtogether/media/ustream/UstreamUserControl.swf" 
+				displayInfoModule="com/watchtogether/media/ustream/UstreamDisplayInfo.swf"
+				mediaViewerModule="com/watchtogether/media/ustream/UstreamViewer.swf"/>
+				
+		<component name="Google Maps"
+				icon="com/watchtogether/ui/dockBar/icons/google-maps-icon-rfx.png"
+				searchModule="com/watchtogether/media/googlemaps/GoogleMapsSearch.swf"
+				userControlModule="com/watchtogether/media/googlemaps/GoogleMapsUserControl.swf"
+				displayInfoModule="com/watchtogether/media/googlemaps/GoogleMapsDisplayInfo.swf" 
+				mediaViewerModule="com/watchtogether/media/googlemaps/GoogleMapsViewer.swf"/>
+				
+		<!-- >component name="Autonomic Management"
+				icon="com/watchtogether/ui/dockBar/icons/google-maps-icon-rfx.png"
+				searchModule="com/watchtogether/media/am/AutonomicManagementSearch.swf"
+				mediaViewerModule="com/watchtogether/media/am/AutonomicManagementViewer.swf"/-->
+				
+		<component name="Test Game"
+				icon="com/watchtogether/ui/dockBar/icons/game-icon-rfx.png"
+				searchModule="com/watchtogether/media/game/GameModuleSearcher.swf"
+				mediaViewerModule="com/watchtogether/media/game/GameModuleViewer.swf"
+				displayInfoModule="com/watchtogether/media/game/GameModuleDisplayInfo.swf" 
+				userControlModule="com/watchtogether/media/game/GameModuleUserControl.swf"/>							
+	</components>
+</config>

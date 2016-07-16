@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<actionScriptProperties analytics="false" mainApplicationPath="main.mxml" projectUUID="c9e58dc8-9a06-4083-a01c-ac7ec433417f" version="10">
+  <compiler additionalCompilerArguments="-locale en_US -includes=mx.managers.systemClasses.MarshallingSupport" autoRSLOrdering="true" copyDependentFiles="true" flex3CompatMode="false" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+    <compilerSourcePath/>
+    <libraryPath defaultLinkType="0">
+      <libraryPathEntry kind="4" path="">
+        <excludedEntries>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/flex.swc" useDefaultLinkType="false"/>
+        </excludedEntries>
+      </libraryPathEntry>
+      <libraryPathEntry kind="1" linkType="1" path="libs"/>
+      <libraryPathEntry kind="3" linkType="1" path="/Flex4Gauge/bin/Flex4Gauge.swc" useDefaultLinkType="false"/>
+    </libraryPath>
+    <sourceAttachmentPath/>
+  </compiler>
+  <applications>
+    <application path="main.mxml"/>
+  </applications>
+  <modules>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/game/GameModuleUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/game/GameModuleUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/am/AutonomicManagementViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/am/AutonomicManagementViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/charts/ChartDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/charts/ChartDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/youtube/YoutubeSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/youtube/YoutubeSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/facebookDomain/FacebookUserListModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/facebookDomain/FacebookUserListModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/youtube/YoutubeViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/youtube/YoutubeViewer.mxml"/>
+    <module application="src/main.mxml" destPath="FacebookFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/facebookDomain/FacebookFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/am/AutonomicManagementSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/am/AutonomicManagementSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/cloudDomain/WTStandaloneLoginModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/cloudDomain/WTStandaloneLoginModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/charts/ChartSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/charts/ChartSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ipalModule/IpalModuleDisplayInfo.swf" optimize="false" sourcePath="src/com/watchtogether/media/ipal/IpalModuleDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/wtdoc/DocsSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/wtdoc/DocsSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ustream/UstreamSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/ustream/UstreamSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/meetingDomain/MeetingFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/meetingDomain/MeetingFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ustream/UstreamViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/ustream/UstreamViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/facebookDomain/photoAlbum/FacebookAlbumSearch.swf" optimize="true" sourcePath="src/com/watchtogether/code/facebookDomain/photoAlbum/FacebookAlbumSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/meetingDomain/MeetingUserListModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/meetingDomain/MeetingUserListModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/game/GameModuleViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/game/GameModuleViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/meetingDomain/MeetingLoginModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/meetingDomain/MeetingLoginModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ipalModule/IpalModuleSearcher.swf" optimize="false" sourcePath="src/com/watchtogether/media/ipal/IpalModuleSearcher.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/game/GameModuleDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/game/GameModuleDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="WTStandaloneLoginModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtStandaloneDomain/WTStandaloneLoginModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/charts/ChartUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/charts/ChartUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ipalModule/IpalModuleUserControl.swf" optimize="false" sourcePath="src/com/watchtogether/media/ipal/IpalModuleUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/rollingchart/RollingChartUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/rollingchart/RollingChartUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/googlemaps/GoogleMapsSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/googlemaps/GoogleMapsSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/rollingchart/RollingChartSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/rollingchart/RollingChartSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/rollingchart/RollingChartViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/rollingchart/RollingChartViewer.mxml"/>
+    <module application="src/main.mxml" destPath="WTStandaloneFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtStandaloneDomain/WTStandaloneFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/courseDomain/MoodleUserListModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/courseDomain/MoodleUserListModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/charts/ChartViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/charts/ChartViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/youtube/YoutubeVideoInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/youtube/YoutubeVideoInfo.mxml"/>
+    <module application="src/main.mxml" destPath="MoodleFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/courseDomain/MoodleFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/googlemaps/GoogleMapsUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/googlemaps/GoogleMapsUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/wtStandaloneDomain/WTStandaloneUserList.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtStandaloneDomain/WTStandaloneUserList.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/game/GameModuleSearcher.swf" optimize="true" sourcePath="src/com/watchtogether/media/game/GameModuleSearcher.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/common/meetingModule/MeetingViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/common/meetingModule/MeetingViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/wtDWPDomain/WTDWPLoginModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtDWPDomain/WTDWPLoginModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/trendRT/TrendRTSearchModule.swf" optimize="true" sourcePath="src/com/watchtogether/media/trendRT/TrendRTSearchModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/wtDWPDomain/WTDWPConstants.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtDWPDomain/WTDWPConstants.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/wtdoc/DocsViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/wtdoc/DocsViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/common/userConfigModule/SettingsViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/common/userConfigModule/SettingsViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/twitter/TwitterSearchModule.swf" optimize="true" sourcePath="src/com/watchtogether/media/twitter/TwitterSearchModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/googlemaps/GoogleMapsDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/googlemaps/GoogleMapsDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/flickr/FlickrDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/flickr/FlickrDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ipalModule/IpalModuleViewer.swf" optimize="false" sourcePath="src/com/watchtogether/media/ipal/IpalModuleViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/wtdoc/DocsDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/wtdoc/DocsDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="MoodleLoginModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/courseDomain/MoodleLoginModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/youtube/YoutubeUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/youtube/YoutubeUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/cloudDomain/WTStandaloneUserList.swf" optimize="true" sourcePath="src/com/watchtogether/code/cloudDomain/WTStandaloneUserList.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/wtDWPDomain/WTDWPUserList.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtDWPDomain/WTDWPUserList.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/twitter/TwitterViewerModule.swf" optimize="true" sourcePath="src/com/watchtogether/media/twitter/TwitterViewerModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/common/userChatModule/ChatViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/common/userChatModule/ChatViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ustream/UstreamDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/ustream/UstreamDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/wtdoc/DocsUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/wtdoc/DocsUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/wtDWPDomain/WTDWPFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/wtDWPDomain/WTDWPFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/flickr/FlickrViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/flickr/FlickrViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/rollingchart/RollingChartDisplayInfo.swf" optimize="true" sourcePath="src/com/watchtogether/media/rollingchart/RollingChartDisplayInfo.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/googlemaps/GoogleMapsViewer.swf" optimize="true" sourcePath="src/com/watchtogether/media/googlemaps/GoogleMapsViewer.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/flickr/FlickrUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/flickr/FlickrUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/flickr/FlickrSearch.swf" optimize="true" sourcePath="src/com/watchtogether/media/flickr/FlickrSearch.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/media/ustream/UstreamUserControl.swf" optimize="true" sourcePath="src/com/watchtogether/media/ustream/UstreamUserControl.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/cloudDomain/WTStandaloneFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/cloudDomain/WTStandaloneFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/testDomain/TestUserListModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/testDomain/TestUserListModule.mxml"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/testDomain/TestFVModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/testDomain/TestFVModule.as"/>
+    <module application="src/main.mxml" destPath="com/watchtogether/code/testDomain/TestLoginModule.swf" optimize="true" sourcePath="src/com/watchtogether/code/testDomain/TestLoginModule.as"/>
+  </modules>
+  <buildCSSFiles/>
+  <flashCatalyst validateFlashCatalystCompatibility="false"/>
+</actionScriptProperties>

@@ -1,0 +1,65 @@
+create database wts_${wt_version}; 
+connect wts_${wt_version};
+
+CREATE TABLE APPLICATION_USERS (
+  user_id varchar(64) NOT NULL,
+  PRIMARY KEY  (user_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE APPLICATION_USE (
+  id int(11) NOT NULL auto_increment,
+  user_id varchar(64) default NULL,
+  app_start_time timestamp NOT NULL default 0,
+  app_end_time timestamp NOT NULL default 0,
+  single_session_id varchar(50) default NULL,
+  PRIMARY KEY  (id),
+  KEY user_id (user_id),
+  CONSTRAINT FOREIGN KEY (user_id) REFERENCES APPLICATION_USERS (user_id)
+) ENGINE=InnoDB;
+
+
+CREATE TABLE APPLICATION_USERS_ACTIVITY (
+  id int(11) NOT NULL auto_increment,
+  user_id varchar(64) default NULL,
+  time_added timestamp NOT NULL default 0,
+  time_removed timestamp NOT NULL,
+  active tinyint(1) default NULL,
+  PRIMARY KEY  (id),
+  KEY user_id (user_id),
+  CONSTRAINT FOREIGN KEY (user_id) REFERENCES APPLICATION_USERS (user_id)
+) ENGINE=InnoDB ;
+
+CREATE TABLE SESSIONS (
+  session_id varchar(50) NOT NULL,
+  session_start timestamp NOT NULL default 0,
+  session_end timestamp NOT NULL default 0,
+  client_ip varchar(15),
+  host_port varchar(5),
+  rt_latency bigint,
+  PRIMARY KEY  (session_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE SESSION_ACTIONS (
+  id int(11) NOT NULL auto_increment,
+  user_id varchar(64) default NULL,
+  action_type varchar(200) default NULL,
+  action_param varchar(200) default NULL,
+  session_id varchar(50) default NULL,
+  PRIMARY KEY  (id),
+  KEY session_id (session_id),
+  KEY user_id (user_id),
+  CONSTRAINT  FOREIGN KEY (session_id) REFERENCES SESSIONS (session_id),
+  CONSTRAINT  FOREIGN KEY (user_id) REFERENCES APPLICATION_USERS (user_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE SESSION_USERS (
+  session_id varchar(50) NOT NULL default '',
+  user_id varchar(64) NOT NULL default '',
+  join_time timestamp NOT NULL default 0,
+  leave_time timestamp NOT NULL default 0,
+  PRIMARY KEY  (session_id,user_id),
+  KEY user_id (user_id),
+  CONSTRAINT FOREIGN KEY (user_id) REFERENCES APPLICATION_USERS (user_id),
+  CONSTRAINT FOREIGN KEY (session_id) REFERENCES SESSIONS (session_id)
+) ENGINE=InnoDB;
+

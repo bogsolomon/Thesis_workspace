@@ -1,0 +1,32 @@
+ <?xml version="1.0" encoding="utf-8"?>
+<config>
+	<server url="rtmpt://wtsrv1-rtmp.watch-together.com:1939/WatchTogetherServer"/>
+	<domainLogin module="FacebookLoginModule">
+		<params>
+			<secretKey value="8717eeb31d244a32d7c23d998d07c7f2"/>
+		</params>	
+	</domainLogin>
+	<flashVars module="FacebookFVModule"/>
+	<userlist module="FacebookUserListModule"/>
+	<chat module="ChatViewer"/>
+	<settings module="SettingsViewer"/>
+	<components>
+		<component name="Flickr" 
+				icon="com/watchtogether/ui/dockBar/icons/flickr-icon-rfx.png" 
+				searchModule="com/watchtogether/media/flickr/FlickrSearch.swf" 
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+		
+		<component name="Youtube" 
+				icon="com/watchtogether/ui/dockBar/icons/youtube-icon-rfx.png" 
+				searchModule="com/watchtogether/media/youtube/YoutubeSearch.swf" 
+				userControlModule="com/watchtogether/media/youtube/YoutubeUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/youtube/YoutubeViewer.swf"/>
+					
+		<component name="Docs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/doc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/doc/DocsUserControl.swf" 
+				mediaViewerModule="com/watchtogether/media/doc/DocsViewer.swf"/>
+	</components>
+</config>

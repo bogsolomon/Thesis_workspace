@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   layout="absolute" width="596" height="334" creationComplete="creationCompleteHandler(event)"
+		   xmlns:controller="com.watchtogether.media.common.userConfigModule.controller.*">
+	<fx:Declarations>
+		<controller:SettingsController id="controller"/>
+		<s:RadioButtonGroup id="viewsGroup" itemClick="viewsGroup_itemClickHandler(event)"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.StatsEvent;
+			import com.watchtogether.code.mediaserver.WebcamReceiveStream;
+			
+			import mx.charts.CategoryAxis;
+			import mx.charts.HitData;
+			import mx.charts.chartClasses.IAxis;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			
+			protected function security_clickHandler(event:MouseEvent):void
+			{
+				controller.blockHide = true;
+				Security.showSettings(SecurityPanel.PRIVACY);
+				accordion.addEventListener(FocusEvent.FOCUS_IN, unblockHide);
+			}
+
+			protected function unblockHide(evt:FocusEvent):void {
+				controller.blockHide = false;
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				MainApplication.instance.dispatcher.addEventListener(StatsEvent.STAT_CHANGE, changedStats);
+			}
+			
+			protected function changedStats(event:StatsEvent):void {
+				latency.text = MainApplication.instance.mediaServerConnection.stats.latency + "ms";
+				ubw.text = formatNumber(MainApplication.instance.mediaServerConnection.stats.ubw, "KBps");
+				dbwc.text = formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_total, "KBps");
+				dbwv.text = formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_video, "KBps");
+				dbwa.text = formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_audio, "KBps");
+				pbw.text = formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_playback, "KBps");
+			}
+						
+			private function categoryAxis_labelFunc(item:Object, prevValue:Object, axis:CategoryAxis, categoryItem:Object):String {
+				var datNum:Number = Date.parse(item);
+				var tempDate:Date = new Date(datNum);
+				return tempDate.hours.toString()+":"+tempDate.minutes.toString()+":"+tempDate.seconds.toString();
+			}
+			
+			private function formatNumber(number:Number, postfix:String):String {
+				var value:String = number+"";
+				return value.substring(0, value.indexOf(".")+3)+postfix;
+			}
+			
+			private function linearAxis_labelFunc(item:Object, prevValue:Object, axis:IAxis):String {
+				return formatNumber(item as Number, "KBps");
+			}
+			
+			public function dataTipFunc(hd:HitData):String {
+				var datNum:Number = Date.parse(hd.item.time);
+				var tempDate:Date = new Date(datNum);
+				
+				var field:String = (hd.element as LineSeries).yField;
+				
+				var bwValue:String = formatNumber(hd.item.dbw, "KBps");
+				var ubwValue:String = formatNumber(hd.item.ubw, "KBps");
+				var value:String = '';
+				
+				
+				if (field == "dbw") {
+					value = tempDate.hours.toString()+":"+tempDate.minutes.toString()+":"+tempDate.seconds.toString() +
+						"\nDownload Bandwidth:"+ bwValue;
+				} else {
+					value = tempDate.hours.toString()+":"+tempDate.minutes.toString()+":"+tempDate.seconds.toString() +
+						"\nUpload Bandwidth:"+ ubwValue
+				}
+					
+				return value;
+			}
+
+			protected function muteUnmuteSession(event:MouseEvent):void
+			{
+				var oldSoundTransforms:Dictionary = MainApplication.instance.session.oldSoundTransforms;
+				
+				var muteSoundTransform:SoundTransform = new SoundTransform();
+				muteSoundTransform.volume = 0;
+				
+				if (muteUnmute.label == "Mute All") {
+					muteUnmute.label = "Unmute All";
+					MainApplication.instance.session.mutedAll = true;
+					for each (var stream:WebcamReceiveStream in MainApplication.instance.sessionStreams) {
+						oldSoundTransforms[stream] = stream.soundTransform;
+						stream.soundTransform = muteSoundTransform;
+					}
+				} else {
+					MainApplication.instance.session.mutedAll = false;
+					muteUnmute.label = "Mute All";
+					for each (stream in MainApplication.instance.sessionStreams) {
+						stream.soundTransform = oldSoundTransforms[stream] as SoundTransform;
+					}
+				}
+			}			
+			
+			protected function othersControl_changeHandler(event:Event):void
+			{
+				MainApplication.instance.session.othersControl = othersControl.selected;
+				var sentObj:Object = new Object();
+				sentObj.value = othersControl.selected;
+				MainApplication.instance.mediaServerConnection.call("roomService.sendToAllInSession", null, "othersControlSession", sentObj);
+			}
+			
+			protected function viewsGroup_itemClickHandler(event:ItemClickEvent):void
+			{
+				var viewsSelected:Number = viewsGroup.selectedValue as Number;
+				MainApplication.instance.nrViewers = viewsSelected;
+			}
+			
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<mx:TabNavigator width="100%" height="100%" id="accordion">
+		
+	<!--mx:Accordion width="100%" height="100%" id="accordion"-->
+		<s:NavigatorContent label="Network Stats" width="100%">
+			<s:layout>
+				<s:VerticalLayout gap="5" horizontalAlign="center"/>
+			</s:layout>
+			<mx:LineChart id="bandwidthChart" showDataTips="true"
+						  dataProvider="{MainApplication.instance.mediaServerConnection.stats.statsList}"
+						  width="570" height="100%"
+						  dataTipRenderer="com.watchtogether.media.common.userConfigModule.renderer.DataTipItemRenderer"
+						  dataTipFunction="dataTipFunc">
+				<mx:series>
+					<mx:LineSeries displayName="Download Bandwidth" yField="dbw" form="curve">
+						<mx:lineStroke>
+							<s:SolidColorStroke color="0xBD2031" weight="2" alpha="0.8"/>
+						</mx:lineStroke>	
+					</mx:LineSeries>
+					<mx:LineSeries displayName="Upload Bandwidth" yField="ubw" form="curve">
+						<mx:lineStroke>
+							<s:SolidColorStroke color="0x006295" weight="2" alpha="0.8"/>
+						</mx:lineStroke>	
+					</mx:LineSeries>
+				</mx:series>
+				<!-- vertical axis -->
+				<mx:verticalAxis>
+					<mx:LinearAxis id="vertAxis" baseAtZero="true"
+								   title="Bandwidth"
+								   labelFunction="linearAxis_labelFunc" />
+				</mx:verticalAxis>
+				
+				<!-- horizontal axis -->
+				<mx:horizontalAxis>
+					<mx:CategoryAxis id="ca"
+									 categoryField="time"
+									 title="Time"
+									 labelFunction="categoryAxis_labelFunc" />
+				</mx:horizontalAxis>
+				
+				<!-- horizontal axis renderer -->
+				<mx:horizontalAxisRenderers>
+					<mx:AxisRenderer axis="{ca}" canDropLabels="true" />
+				</mx:horizontalAxisRenderers>
+				<mx:seriesFilters>
+					<fx:Array/>
+				</mx:seriesFilters>
+			</mx:LineChart>
+			<mx:Legend direction="horizontal">
+				<mx:LegendItem label="Upload Bandwidth" fontWeight="bold">
+					<mx:fill>
+						<mx:SolidColor color="0x006295" alpha="0.8"/>
+					</mx:fill>
+					<mx:stroke>
+						<s:SolidColorStroke color="0xCCCCCC" weight="2"/>
+					</mx:stroke>
+				</mx:LegendItem>
+				<mx:LegendItem label="Download Bandwidth" fontWeight="bold">
+					<mx:fill>
+						<mx:SolidColor color="0xBD2031" alpha="0.8"/>
+					</mx:fill>
+					<mx:stroke>
+						<s:SolidColorStroke color="0xCCCCCC" weight="2"/>
+					</mx:stroke>
+				</mx:LegendItem>
+			</mx:Legend>
+			<s:Group width="100%">
+				<s:layout>
+					<s:TileLayout requestedColumnCount="4" horizontalGap="10"/>
+				</s:layout>
+				<s:Label text="Latency:"/>
+				<s:Label id="latency" text="{MainApplication.instance.mediaServerConnection.stats.latency + 'ms'}"/>
+				<s:Label text="Upload Bandwidth:"/>
+				<s:Label id="ubw" text="{formatNumber(MainApplication.instance.mediaServerConnection.stats.ubw, 'KBps')}"/>
+				<s:Label text="Download Bandwidth:"/>
+				<s:Label id="dbwc" text="{formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_total, 'KBps')}"/>
+				<s:Label text="Download Bandwidth (Video):"/>
+				<s:Label id="dbwv" text="{formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_video, 'KBps')}"/>
+				<s:Label text="Download Bandwidth (Audio):"/>
+				<s:Label id="dbwa" text="{formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_audio, 'KBps')}"/>
+				<s:Label text="Playback Bandwidth:"/>
+				<s:Label id="pbw" text="{formatNumber(MainApplication.instance.mediaServerConnection.stats.dbw_playback, 'KBps')}"/>
+			</s:Group>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Settings" width="100%">
+			<s:Button label="Security Settings" horizontalCenter="0" verticalCenter="0" click="security_clickHandler(event)"/>
+			<s:Label x="10" y="10" text="Number of Views"/>
+			<s:HGroup x="10" y="30" gap="40">
+				<s:RadioButton label="1" groupName="viewsGroup" value="1" selected="true"/>
+				<s:RadioButton label="2" groupName="viewsGroup" value="2"/>
+			</s:HGroup>
+		</s:NavigatorContent>
+		<s:NavigatorContent label="Session settings" width="100%">
+			<s:CheckBox id="othersControl" selected="{MainApplication.instance.session.othersControl}" enabled="{!(MainApplication.instance.sessionListDataProvider.length == 0
+						|| !MainApplication.instance.login.loggedInUser.isBoss)}" change="othersControl_changeHandler(event)" top="0" left="17"/>
+			<s:Label id="otherControlLabel" text="Others can control the session" left="34" fontWeight="bold" fontSize="11" top="5"/>
+			<s:Button id="muteUnmute" label="Mute All" click="muteUnmuteSession(event)" left="17" top="30"/>
+		</s:NavigatorContent>
+	<!--/mx:Accordion-->
+	</mx:TabNavigator>
+</mx:Module>

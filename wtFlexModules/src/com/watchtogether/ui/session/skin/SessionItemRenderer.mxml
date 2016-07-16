@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="false" xmlns:skin="com.watchtogether.ui.session.skin.*">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.Configurator;
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.SessionEvent;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.code.mediaserver.WebcamReceiveStream;
+			
+			import mx.controls.Alert;
+			import mx.controls.SWFLoader;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			import mx.events.VideoEvent;
+			
+			import org.osmf.events.MediaPlayerStateChangeEvent;
+			
+			import spark.components.mediaClasses.DynamicStreamingVideoItem;
+			import spark.components.mediaClasses.DynamicStreamingVideoSource;
+			import spark.events.DropDownEvent;
+			
+			private var imgLoader:SWFLoader = new SWFLoader();
+			private var state:String;
+			
+			override public function set data(inObject:Object):void{
+				super.data = inObject;
+				
+				if (data != null) {
+					if ((data as AbstractUser).isStreaming) {
+						if (videoDisplay.stream == null) {
+							videoDisplay.attachVideoStream(data.uid + MainApplication.instance.login.getUIDPostfix(), 125, 125);
+							
+							videoDisplay.visible = true;
+							userImage.visible = false;
+							awaitingReplyUserImage.visible = false;
+							sound.visible = true;
+						}
+					} else if ((data as AbstractUser).accepted == true) {
+						disableStream();
+						
+						userImage.source = data.pic;
+						
+						userImage.visible = true;
+						awaitingReplyUserImage.visible = false;
+						videoDisplay.visible = false;
+						sound.visible = false;
+					} else {
+						disableStream();
+						
+						userImage.visible = false;
+						awaitingReplyUserImage.visible = true;
+						videoDisplay.visible = false;
+						sound.visible = false;
+					}
+					
+					MainApplication.instance.dispatcher.addEventListener(SessionEvent.USER_CHANGED, handleUserInfoChanged);
+				} else {
+					disableStream();
+					this.removeAllElements();
+					MainApplication.instance.dispatcher.removeEventListener(SessionEvent.USER_CHANGED, handleUserInfoChanged);
+					sound.visible = false;
+				}
+			}
+			
+			private function videoReady(event:mx.events.VideoEvent):void {
+				videoDisplay.visible = true;
+			}
+			
+			private function handleUserInfoChanged(event:SessionEvent):void {
+				if (this.parent != null) {
+					if (event.userId == data.uid) {
+						if ((data as AbstractUser).isStreaming && (MainApplication.instance.remoteMaximizedUserId != data.uid)) {
+							videoDisplay.attachVideoStream(data.uid + MainApplication.instance.login.getUIDPostfix(), 125, 125);
+							
+							videoDisplay.visible = true;
+							userImage.visible = false;
+							awaitingReplyUserImage.visible = false;
+							sound.visible = true;
+						} else if ((data as AbstractUser).accepted) {
+							disableStream();
+							
+							userImage.source = data.pic;
+							userImage.visible = true;
+							awaitingReplyUserImage.visible = false;
+							videoDisplay.visible = false;
+							sound.visible = false;
+						} else {
+							disableStream();
+							
+							userImage.visible = false;
+							awaitingReplyUserImage.visible = true;
+							videoDisplay.visible = false;
+							sound.visible = false;
+						}
+						
+						this.validateNow();
+					}
+				} else {
+					MainApplication.instance.dispatcher.removeEventListener(SessionEvent.USER_CHANGED, handleUserInfoChanged);
+				}
+			}
+			
+			private function disableStream():void {
+				videoDisplay.detachVideoStream();
+			}
+
+			protected function sound_clickHandler(event:MouseEvent):void
+			{
+				videoDisplay.muteUnmute();
+			}
+
+
+			protected function sound_changeHandler(event:Event):void
+			{
+				videoDisplay.setVolume(sound.value);
+			}
+
+			public function passControl():void
+			{
+				MainApplication.instance.mediaServerConnection.call("roomService.giveHostControl", null , data.uid+"");
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Panel width="127" height="151" y="2" title="{data.first_name + ' '+data.last_name}"
+			 skinClass="com.watchtogether.ui.session.skin.ContactPanelSkin"
+			 cornerRadius="10" dropShadowVisible="false">
+		<s:Rect width="100%" height="100%">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry color="#FFFFFF" />
+					<s:GradientEntry color="#C8C8C8" />
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+		<s:Group width="100%" height="100" x="2" bottom="20">
+			<mx:Image id="userImage" visible="true" horizontalCenter="0" verticalCenter="0" verticalAlign="middle"/>
+			<mx:Image id="awaitingReplyUserImage" visible="false" horizontalCenter="0" verticalCenter="0" source="@Embed(source='com/watchtogether/ui/session/icons/awaiting_reply.gif')"/>
+		</s:Group>
+		<skin:VideoPanel id="videoDisplay" width="125" height="125" horizontalCenter="0" verticalCenter="0" visible="false" bottom="0"/>
+		<s:VolumeBar id="sound" enabled="true" buttonMode="true" 
+					 click="sound_clickHandler(event)" right="4" bottom="10"
+					 change="sound_changeHandler(event)"
+					 minimum="0" maximum="100" value="100" rollOverOpenDelay="0"
+					 visible="false" height="15" width="15"
+					 skinClass="com.watchtogether.ui.session.skin.VolumeBarSession"
+					 alpha="0.5"/>
+	</s:Panel>
+</s:ItemRenderer>

@@ -1,0 +1,41 @@
+<!--
+	For Dock Bar
+-->
+
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+			 xmlns:s="library://ns.adobe.com/flex/spark">
+	<!-- Host Component -->
+	<fx:Metadata>[HostComponent("com.watchtogether.ui.dockBar.DockBar")]</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			[Embed(source="com/watchtogether/ui/dockBar/icons/tray.png")]
+			[Bindable]
+			private var trayImge:Class;
+		]]>
+	</fx:Script>
+	<!-- Skin States -->
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+	</s:states>
+	
+	<!-- Tray Fill Layer -->
+	<s:Rect top="0" bottom="0" left="0" right="0">
+		<s:fill>
+			<s:BitmapFill source="{trayImge}" smooth="true" />
+		</s:fill>
+	</s:Rect>
+
+	<!-- Item Layer -->
+	<s:Group id="iconLayer" width="100%" height="75%" bottom="{this.height * 0.20}">
+	<!--<s:Group width="100%" height="75%" bottom="{this.height * 0.30}">-->
+		<s:layout>
+			<s:VerticalLayout horizontalAlign="center" paddingLeft="64" paddingRight="64" />
+		</s:layout>
+		<s:Group id="contentGroup">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="bottom" gap="2"/>
+			</s:layout>
+		</s:Group>
+	</s:Group>
+</s:SparkSkin>

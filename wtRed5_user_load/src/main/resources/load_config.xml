@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<distributionType>poisson</distributionType>
+	<userCount>20</userCount>
+	<userLifetime>500000</userLifetime>
+	<avgSessionSize>4</avgSessionSize>
+	<avgUsersStreamingPerSession>2</avgUsersStreamingPerSession>
+	<avgSessionActionDelay>25000</avgSessionActionDelay>
+</config>

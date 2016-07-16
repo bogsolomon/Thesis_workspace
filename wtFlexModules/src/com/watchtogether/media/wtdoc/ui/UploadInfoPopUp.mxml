@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="430" height="300"
+			   close="{PopUpManager.removePopUp(this)}; docsSearchController.blockHide = false;">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.media.wtdoc.controller.DocsSearchController;
+			
+			import mx.collections.ArrayList;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			public var fileListDataProvider:ArrayList;
+			
+			public var docsSearchController:DocsSearchController;
+
+			private function upload(event:MouseEvent):void {
+				docsSearchController.uploadDocs(fileListDataProvider);
+			}
+		]]>
+	</fx:Script>
+	<s:List id="fileList" dataProvider="{fileListDataProvider}" width="425" height="203" y="27">
+		<s:itemRenderer>
+			<fx:Component>
+				<s:ItemRenderer>
+					<s:HGroup verticalCenter="0" left="2"
+							  right="2" top="2" bottom="2">
+						<s:Label text="{data.fileName}" width="130" maxDisplayedLines="2"/>
+						<s:TextInput id="desc" text="{data.fileDescription}" change="{data.fileDescription = desc.text}"/>
+						<s:ComboBox id="privacyBox" selectedIndex="1" change="{data.privacy = privacyBox.selectedIndex}">
+							<s:dataProvider>
+								<mx:ArrayList>
+									<fx:String>Public</fx:String>
+									<fx:String>Private</fx:String>
+								</mx:ArrayList>
+							</s:dataProvider>
+						</s:ComboBox>
+					</s:HGroup>
+				</s:ItemRenderer>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:List>
+	<s:Button label="Upload" click="{upload(event)}" y="236" horizontalCenter="-50">
+	</s:Button>
+	<s:Button label="Cancel" click="{PopUpManager.removePopUp(this); docsSearchController.blockHide = false;}" y="236" horizontalCenter="50">
+	</s:Button>
+	<s:Label x="10" y="10" text="File Name"/>
+	<s:Label x="152" y="10" text="File Description"/>
+	<s:Label x="327" y="11" text="Privacy"/>
+</s:TitleWindow>

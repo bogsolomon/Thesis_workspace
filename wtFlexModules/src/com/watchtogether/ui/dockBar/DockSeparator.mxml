@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dock:DockBarElement xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:dock="com.watchtogether.ui.dockBar.*"
+		 mouseMove="doNothing(event)"
+		 mouseOver="onMouseMove(event)"
+		 mouseUp="doNothing(event)"
+		 iconSource="">
+	<fx:Script>
+		<![CDATA[
+		/* ------------- Event Handlers ------------- */
+		
+		/**
+		 * Enlarges icon and ajusted siblings in functon of
+		 * the X position of the mouse pointer.
+		 */
+		override protected function onMouseMove(event:MouseEvent):void
+		{
+			event.stopPropagation();
+			/*var mousePosX:Number = calculateRatioX(event.localX);
+			if(isNaN(mousePosX)) mousePosX = 0;
+			var myIndex:int = parent.getChildIndex(this);
+			var numChildren:int = parent.numChildren;
+			var newSizeRatioL:Number = mousePosX;
+			var newSizeRatioR:Number = Math.abs(1 - mousePosX);
+			// if this is not the first child
+			if(myIndex > 0)
+			{
+				var leftSibling:DockBarElement = parent.getChildAt(myIndex - 1) as DockBarElement;
+				leftSibling.resizeByRatio(newSizeRatioL, true);
+			}
+			// if this is not the last child
+			if(myIndex < (numChildren -1))
+			{
+				var rightSiblig:DockBarElement = parent.getChildAt(myIndex + 1) as DockBarElement;
+				rightSiblig.resizeByRatio(newSizeRatioR, false);
+			}*/
+	 	}
+		
+		private function doNothing(event:MouseEvent):void{event.stopPropagation();}
+		]]>
+	</fx:Script>
+</dock:DockBarElement>

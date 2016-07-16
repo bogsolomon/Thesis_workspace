@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/halo"
+		 mouseMove="onMouseMove(event)"
+		 mouseOut="onMouseOut(event)"
+		 mouseUp="onMouseUp(event)"
+		 creationComplete="init(event);"
+		 width="{iconWidth}"
+		 height="{iconHeight}">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.Configurator;
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.constants.DeploymentConstants;
+			import com.watchtogether.ui.contentViewer.ContentViewer;
+			import com.watchtogether.ui.dockBar.skin.DockBarElementSkin;
+			import com.watchtogether.ui.dockBar.skin.DockBarSkin;
+			
+			import mx.controls.SWFLoader;
+			import mx.core.Application;
+			import mx.core.FlexGlobals;
+			import mx.events.EffectEvent;
+			import mx.modules.ModuleLoader;
+			
+			import spark.filters.GlowFilter;
+			
+			// Icon image source and loader
+			public var iconSource:String;
+			private var iconLoader:SWFLoader;
+			private var icon2Loader:SWFLoader;
+			
+			// Default height and width
+			[Bindable]
+			public var iconHeight:Number;
+			[Bindable]
+			public var iconWidth:Number;
+			
+			// Temp height and width
+			[Bindable]
+			protected var tempHeight:Number;
+			[Bindable]
+			protected var tempWidth:Number;
+			
+			[Bindable]
+			private var iconAlpha:Number = 1;
+			[Bindable]
+			private var iconState2Alpha:Number = 0;
+			
+			private var iconFlashCount:Number = 0;
+			private static var iconFlashCountNumber:Number = 5;
+			
+			// Other properties
+			public var zoomRatio:Number;
+			
+			// Paths to modules to be loaded
+			public var searchModulePath:String;
+			public var displayInfoModulePath:String;
+			public var userControlsModulePath:String;
+			public var mediaViewerModulePath:String;
+			
+			private var app:main;
+			private var _searchModule:ModuleLoader = new ModuleLoader();
+			
+			public function get searchModule():ModuleLoader
+			{
+				return _searchModule;
+			}
+
+			/**
+			 * Initialize all variables to defaults.
+			 */
+			private function init(event:Event):void
+			{
+				app = (FlexGlobals.topLevelApplication as main);
+				tempHeight = iconHeight;
+				tempWidth = iconWidth;
+				if(isNaN(zoomRatio))zoomRatio = 1.3;
+				// load the icon image
+				iconLoader = new SWFLoader();
+				iconLoader.addEventListener(Event.COMPLETE, setIconImage);
+				iconLoader.load(iconSource);
+			}
+			
+			public function setImageIcon(location:String):void {
+				iconSource = location;
+				iconLoader.addEventListener(Event.COMPLETE, setIconImage);
+				iconLoader.load(location);
+				
+				if (this.id == "userChatModule") {
+					icon2Loader = new SWFLoader();
+					icon2Loader.addEventListener(Event.COMPLETE, setIcon2Image);
+					icon2Loader.load(Configurator.instance.baseURL+DeploymentConstants.CHAT_ICON_STATE2);
+				}
+			}
+
+			// ----------------- Event Listeners ----------------- //
+			/**
+			 * Enlarges icon and ajusted siblings in functon of
+			 * the X position of the mouse pointer.
+			 */
+			protected function onMouseMove(event:MouseEvent):void
+			{
+				event.stopPropagation();
+				tempHeight = zoomRatio * iconHeight;
+				tempWidth = zoomRatio * iconWidth;
+				//iconResize.stop();
+				//iconResize.suspendBackgroundProcessing = true;
+				iconResize.play();
+				//this.invalidateDisplayList();
+				/*var mousePosX:Number = calculateRatioX(event.localX);
+				if(isNaN(mousePosX)) mousePosX = 0;
+				var myIndex:int = parent.getChildIndex(this);
+				var numChildren:int = parent.numChildren;
+				var newSizeRatioL:Number = mousePosX;
+				var newSizeRatioR:Number = Math.abs(1 - mousePosX);
+				// if this is not the first child
+				if(myIndex > 0)
+				{
+					var leftSibling:DockBarElement = parent.getChildAt(myIndex - 1) as DockBarElement;
+					leftSibling.resizeByRatio(newSizeRatioL, true);
+				}
+				// if this is not the last child
+				if(myIndex < (numChildren -1))
+				{
+					var rightSiblig:DockBarElement = parent.getChildAt(myIndex + 1) as DockBarElement;
+					rightSiblig.resizeByRatio(newSizeRatioR, false);
+				}*/
+			}
+
+			/**
+			 * Restores the icon size to the initial state.
+			 */
+			protected function onMouseOut(event:MouseEvent):void
+			{
+				event.stopPropagation();
+				iconResize.stop();
+				this.makeSizeSmall();
+				iconResize.play();
+				/*if( iconSmaller.isPlaying || iconBigger.isPlaying)
+				{
+					//event.stopImmediatePropagation();
+					return;
+				}*/
+				// test if the target is a dock bar element.
+				/*var ypos:Number = event.localY;
+				var xpos:Number = event.localX;
+				if((ypos <= 0 || ypos >= this.height) || (xpos <= 0 || xpos >= this.width))
+				{
+					var relatedElement:Object = event.relatedObject;
+					if(relatedElement is DockBarElement || 
+					   relatedElement is DockBarElementSkin ||
+					   relatedElement is DockBar ||
+					   relatedElement is DockBarSkin)
+					{
+						event.stopPropagation();
+					}
+					else
+					{
+						makeSizeSmall();
+						//iconResize.stop();
+						iconResize.suspendBackgroundProcessing = true;
+						iconResize.play();
+					}
+				}
+				else
+				{
+					// then stop propagation
+					event.stopPropagation();
+				}*/
+			}
+			
+			protected function onMouseUp(event:MouseEvent):void
+			{
+				if (this.id == DeploymentConstants.DESKTOP_CHANGE_ID) {
+					var newDesktop:int = MainApplication.instance.changeSelectedDesktop();
+					
+					if (newDesktop == 2) {
+						this.setImageIcon(Configurator.instance.baseURL+
+							DeploymentConstants.DESKTOP2_SEL_ICON);
+					} else {
+						this.setImageIcon(Configurator.instance.baseURL+
+							DeploymentConstants.DESKTOP1_SEL_ICON);
+					}
+					
+					return;
+				}
+				
+				event.stopPropagation();
+				
+				
+				//stop in progress animation
+				if (iconFlashCount > 0) {
+					iconFlashCount = 0;
+					iconFadeIcon.stop();
+					iconFadeIconState2.stop();
+				}
+				
+				if(iconState2Alpha == 1) {
+					iconAlpha = 1;
+					iconState2Alpha = 0;
+					iconFadeIcon.play();
+					iconFadeIconState2.play();
+				}
+				
+				if (searchModule.url == null) {
+					searchModule.loadModule(searchModulePath);
+				}
+				
+				var contentViewer:ContentViewer = MainApplication.instance.localSelectedContentViewer;
+				
+				contentViewer.showSearchPanel(searchModule);
+				
+				if (this.id != DeploymentConstants.USER_LIST_ID && this.id != DeploymentConstants.CHAT_ID && this.id != DeploymentConstants.CONFIG_ID) {
+					contentViewer.setMediaViewer(mediaViewerModulePath);
+					contentViewer.setUserControls(userControlsModulePath);
+					contentViewer.setMediaInfo(displayInfoModulePath);
+				}
+			}
+			
+			private function setIconImage(e:Event):void
+			{
+				iconLoader.removeEventListener(Event.COMPLETE, setIconImage);
+				icon.source = iconLoader.content;
+			}
+			
+			private function setIcon2Image(e:Event):void
+			{
+				icon2Loader.removeEventListener(Event.COMPLETE, setIcon2Image);
+				iconState2.source = icon2Loader.content;
+			}
+
+			// ----------------- Image Resize Methods ----------------- //
+			/**
+			 */
+			protected function calculateRatioX(locationX:Number):Number
+			{
+				var out:Number = locationX /tempWidth;
+				return new Number(out.toFixed(2));
+			}
+			
+			/**
+			 * Method called by siblings, when stimulated by mouse
+			 * move events, which will adjust this elemet's size
+			 * in function to the mouse mouvement.
+			 */
+			public function resizeByRatio(ratio:Number, isLeftSibling:Boolean):void
+			{
+				if(ratio > zoomRatio * 0.3) ratio = zoomRatio * 0.3;
+				tempHeight = iconHeight*(zoomRatio - ratio);
+				tempWidth = iconWidth*(zoomRatio - ratio);
+				//iconResize.stop;
+				iconResize.suspendBackgroundProcessing = true;
+				iconResize.play();
+				var numChildren:int = parent.numChildren;
+				var myIndex:int = parent.getChildIndex(this);
+				var temp:Number = zoomRatio * 0.4;
+				if(isLeftSibling)
+				{
+					if(myIndex > 0)
+					{
+						var leftSibling:DockBarElement = parent.getChildAt(myIndex - 1) as DockBarElement;
+						leftSibling.tempHeight = leftSibling.iconHeight * (zoomRatio - temp);
+						leftSibling.tempWidth = leftSibling.iconWidth * (zoomRatio - temp);
+						//leftSibling.iconResize.stop();
+						leftSibling.iconResize.suspendBackgroundProcessing = true;
+						leftSibling.iconResize.play();
+					}
+				}
+				else
+				{
+					if(myIndex < (numChildren -1))
+					{
+						var rightSiblig:DockBarElement = parent.getChildAt(myIndex + 1) as DockBarElement;
+						rightSiblig.tempHeight = rightSiblig.iconHeight * (zoomRatio - temp);
+						rightSiblig.tempWidth = rightSiblig.iconWidth * (zoomRatio - temp);
+						//rightSiblig.iconResize.stop();
+						rightSiblig.iconResize.suspendBackgroundProcessing = true;
+						rightSiblig.iconResize.play();
+					}
+				}
+			}
+			
+			/**
+			 * Changes the resize value to the defailt,
+			 * that is to the samll settings.
+			 */
+			public function makeSizeSmall():void
+			{
+				tempHeight = iconHeight;
+				tempWidth = iconWidth;
+			}
+
+			public function loadSearchPanel():void {
+				searchModule.loadModule(searchModulePath);
+			}
+			
+//			public function showSearchPanel():void
+//			{
+//				if (MainApplication.instance.selected_desktop == 1) {
+//					app.contentViewer1.showSearchPanel(searchModule);
+//				} 
+//				
+////				else if (MainApplication.instance.selected_desktop == 2) {
+////					app.contentViewer2.showSearchPanel(searchModule);
+////				}
+//			}
+
+			// -------------------- Other Functions --------------- //
+			public function start3dSpin():void
+			{
+				iconAlpha = 0;
+				iconState2Alpha = 1;
+				iconFadeIcon.play();
+				iconFlashCount = iconFlashCountNumber;
+				iconFadeIcon.addEventListener(EffectEvent.EFFECT_END, iconFadeIcon_effectEndHandler);
+				iconFadeIconState2.play();
+			}
+			
+			public function stop3dSpin():void
+			{
+				iconSpin3D.end();
+				iconSpin3D.repeatCount = 0;
+				iconSpin3D.angleYTo = 0;
+				iconSpin3D.play();
+			}
+
+			protected function iconFadeIcon_effectEndHandler(event:EffectEvent):void
+			{
+				iconFadeIcon.removeEventListener(EffectEvent.EFFECT_END, iconFadeIcon_effectEndHandler);
+				iconFlashCount --;
+				iconFadeIcon.addEventListener(EffectEvent.EFFECT_END, iconFadeIcon_effectEndHandler2);
+				iconAlpha = 1;
+				iconState2Alpha = 0;
+				iconFadeIcon.play();
+				iconFadeIconState2.play();
+			}
+			
+			protected function iconFadeIcon_effectEndHandler2(event:EffectEvent):void
+			{
+				iconFadeIcon.removeEventListener(EffectEvent.EFFECT_END, iconFadeIcon_effectEndHandler2);
+				iconFlashCount --;
+				if (iconFlashCount > 0)
+					iconFadeIcon.addEventListener(EffectEvent.EFFECT_END, iconFadeIcon_effectEndHandler);
+				iconAlpha = 0;
+				iconState2Alpha = 1;
+				iconFadeIcon.play();
+				iconFadeIconState2.play();
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Resize id="iconResize"
+				  target="{this}"
+				  heightTo="{tempHeight}"
+				  widthTo="{tempWidth}"
+				  duration="250" />
+		<s:Rotate3D id="iconSpin3D"
+					target="{icon}"
+					angleYFrom="0"
+					duration="1000"					
+					autoCenterTransform="true" />
+		<s:Fade id="iconFadeIcon" target="{icon}" alphaTo="{iconAlpha}"/>
+		<s:Fade id="iconFadeIconState2" target="{iconState2}" alphaTo="{iconState2Alpha}"/>
+	</fx:Declarations>
+	<s:BitmapImage id="icon" verticalCenter="0" horizontalCenter="0" alpha="1" smooth="true" width="100%" height="100%" />
+	<s:BitmapImage id="iconState2" verticalCenter="0" horizontalCenter="1" smooth="true" alpha="0" width="100%" height="100%" />
+</s:Group>

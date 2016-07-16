@@ -1,0 +1,6 @@
+JDBCDriver=com.mysql.jdbc.Driver
+stats_JDBCConnection=jdbc:mysql://${mysql_host}:3306/wts_${wt_version}
+users_JDBCConnection=jdbc:mysql://${mysql_host}:3306/wtu_${wt_version}
+content_JDBCConnection=jdbc:mysql://${mysql_host}:3306/wtc_${wt_version}
+Username=${dbuser}
+Password=${dbpass}

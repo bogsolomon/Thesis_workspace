@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:controls="com.watchtogether.ui.spinner.controls.*" xmlns:autoComplete="com.watchtogether.ui.autoComplete.*">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.watchtogether.ui.medialist.MediaList")]
+	</fx:Metadata>
+
+	<s:states>
+		<s:State name="searching"/>
+		<s:State name="noresults"/>
+		<s:State name="listView"/>
+		<s:State name="iconView"/>
+	</s:states>
+	
+	<s:HGroup
+		id="extraComponents" 
+		horizontalAlign="left"
+		top="2" left="12"/>
+	
+	<autoComplete:AutoComplete dataProvider="{hostComponent.autoCompleteDataProvider}" 
+		id="searchInput" focusIn="searchInput.inputTxt.drawFocus(true);" toolTip="Enter search term" 
+		height="22" focusEnabled="true" top="29" left="12" right="90" 
+		select="hostComponent.search(searchInput.text)" 
+		enter="hostComponent.search(searchInput.text)"
+		textChanged="hostComponent.textChanged(searchInput.text)"/>
+	
+	<s:Button 
+		id="searchBtn" 
+		label="Search" 
+		click="hostComponent.search(searchInput.text)"
+		width="80" height="22" 
+		color="#0b333c" 
+		top="29" right="2"/>
+	
+	<controls:Spinner id="spinner" tickColor="#999999" 
+					  size="30" numTicks="12" tickWidth="3" speed="1000" fadeSpeed="600" visible.searching="true"
+					  visible.iconView="false" visible.listView="false" visible.noresults="false"
+					  horizontalCenter="0" verticalCenter="0"/>
+	
+	<s:TextArea editable="false" verticalCenter="0" horizontalCenter="0" 
+				visible.iconView="false" visible.listView="false" visible.searching="false" visible.noresults="true"
+				borderVisible="false" height="30" contentBackgroundAlpha="0">
+		<s:span color="#FF0000" backgroundAlpha="0">
+			No Search Results Found
+		</s:span>
+	</s:TextArea>
+	
+	<s:List
+		id="list"
+		skinClass="com.watchtogether.ui.medialist.skin.ThumbNailListSkin"
+		itemRenderer.iconView="com.watchtogether.ui.medialist.skin.SearchResultRenderer"
+		itemRenderer.listView="com.watchtogether.ui.medialist.skin.SearchResultRendererListView"
+		dataProvider="{hostComponent.searchResultDataProvider}"
+		top="56" bottom="7" width="592" height="275"
+		horizontalCenter="0" visible.searching="false"
+		visible.iconView="true" visible.listView="true" visible.noresults="false"/>
+</s:Skin>

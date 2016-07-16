@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  skinClass="com.watchtogether.ui.userpanel.skin.LatencyDisplaySkin">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			
+			import mx.collections.ArrayCollection;
+			[Bindable]
+			public var barColor:uint = 0x60BB22;
+			
+			private var _usedBars:Number = 0;
+			
+			[Bindable]
+			public var alphaBar:ArrayCollection = new ArrayCollection(new Array(5));
+
+			public function get usedBars():Number
+			{
+				return _usedBars;
+			}
+
+			public function set usedBars(value:Number):void
+			{
+				_usedBars = value;
+				
+				for (var i:int=0;i<_usedBars;i++) {
+					alphaBar.setItemAt(1, i);
+				}
+				
+				for (i=_usedBars;i<5;i++) {
+					alphaBar.setItemAt(0, i);
+				}
+			}
+
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>

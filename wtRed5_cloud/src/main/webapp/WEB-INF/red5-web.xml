@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <property name="location" value="/WEB-INF/red5-web.properties" />
+	</bean>
+	
+	<bean id="web.context" class="org.red5.server.Context" 
+		autowire="byType" />
+	
+	<bean id="web.scope" class="org.red5.server.scope.WebScope"
+		 init-method="register">
+		<property name="server" ref="red5.server" />
+		<property name="parent" ref="global.scope" />
+		<property name="context" ref="web.context" />
+		<property name="handler" ref="wtRed5.handler" />
+		<property name="contextPath" value="${webapp.contextPath}" />
+		<property name="virtualHosts" value="${webapp.virtualHosts}" />
+	</bean>
+
+	<bean id="wtRed5.handler" 
+	    class="com.watchtogether.server.deploy.WatchTogetherServerModule"
+		singleton="true" destroy-method="stop"/>
+		
+	<bean id="docService.service" class="com.watchtogether.server.services.DocumentService"
+		depends-on="wtRed5.handler" singleton="true" init-method="appStart">
+		<property name="coreServer" ref="wtRed5.handler" />
+	</bean>
+	<bean id="roomService.service" class="com.watchtogether.server.services.RoomService"
+		depends-on="wtRed5.handler" singleton="true" init-method="appStart">
+		<property name="coreServer" ref="wtRed5.handler" />
+	</bean>
+	<bean id="userService.service" class="com.watchtogether.server.services.UserStateService"
+		depends-on="wtRed5.handler" singleton="true" init-method="appStart">
+		<property name="coreServer" ref="wtRed5.handler" />
+	</bean>
+	<bean id="webcamStreamService.service" class="com.watchtogether.server.services.WebcamVideoStreamService"
+		depends-on="wtRed5.handler" singleton="true" init-method="appStart">
+		<property name="coreServer" ref="wtRed5.handler" />
+	</bean>
+	<bean id="serverStatsService.service" class="com.watchtogether.server.services.ServerStatsService"
+		depends-on="wtRed5.handler" singleton="true" init-method="appStart">
+		<property name="coreServer" ref="wtRed5.handler" />
+	</bean>
+</beans>

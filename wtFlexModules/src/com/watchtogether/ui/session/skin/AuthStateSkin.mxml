@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:mx="library://ns.adobe.com/flex/mx" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	alpha="1">
+	
+	<fx:Metadata>
+		[HostComponent("spark.components.SkinnableContainer")]
+	</fx:Metadata> 
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+		<s:State name="unknown" /> <!--?-->
+		<s:State name="approved"/> <!--✓-->
+		<s:State name="denied"/> <!--X-->
+	</s:states>
+	
+	<!-- Ugly code coupling but unsure of how else to do it -->
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import com.watchtogether.code.MainApplication;
+			
+						
+			private function hideHandler():void{
+				(MainApplication.instance.app as main).authStateSkin.visible=false;	//see notifyFaceDetect() in ServerConnection.as for how gets re-enabled
+			}
+			
+			private function showHandler():void{
+				(MainApplication.instance.app as main).authStateSkin.visible=true;	//see notifyFaceDetect() in ServerConnection.as for how gets re-enabled
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:Sequence id="fadeHideSeq"
+					target="{(MainApplication.instance.app as main).authStateSkin}"
+					duration="1000"
+					effectEnd="hideHandler();"> <!-- hideHandler above disables visibility on whole authStateSkin -->
+			<s:Fade id="fadeHide" 
+					alphaFrom="1.0"
+					alphaTo="0.0"/>
+		</s:Sequence>      
+		
+		<s:Sequence id="fadeShowSeq"
+					target="{(MainApplication.instance.app as main).authStateSkin}"
+					duration="1000"
+					effectEnd="showHandler();">
+					<s:Fade id="fadeShow" 
+					alphaFrom="0.0"
+					alphaTo="1.0"/>
+		</s:Sequence>   
+	</fx:Declarations>
+	
+	<s:transitions>
+		<!--when going into approved (logged in) state -->
+		<s:Transition fromState="*" toState="approved">
+			<s:Sequence effectEnd="fadeHideSeq.end();fadeHideSeq.play();">
+				<s:CrossFade target="{image}" duration="750"/>
+				<!--effectEnd calls fade so that happens on the entire authStateSkin, not just the state (or white background will remain)-->
+			</s:Sequence>
+		</s:Transition>
+				
+		<!--when coming out of approved (logged in) state -->
+		<s:Transition fromState="approved" toState="*">
+			<s:Sequence effectEnd="fadeShowSeq.end();fadeShowSeq.play();">
+				<!--<s:Fade target="{image}" duration="500" alphaFrom="0.0" alphaTo="1.0" />-->
+			</s:Sequence>
+		</s:Transition>
+		
+		<!--transitions between unknown state and denied state -->
+		<s:Transition fromState="*" toState="*">
+			<s:Sequence>
+				<s:CrossFade target="{image}" duration="500" />
+			</s:Sequence>
+		</s:Transition>
+	</s:transitions>
+	
+	<!-- layer 1: border -->
+	<s:Rect left="0" right="0" top="0" bottom="0">
+		<s:stroke>
+			<s:SolidColorStroke color="white" alpha="1" weight="1" />
+		</s:stroke>
+	</s:Rect>
+	
+	<!-- background fill -->
+	<s:Rect id="background" left="1" top="1" right="1" bottom="1">
+		<s:fill>
+			<s:SolidColor color="white" alpha="1"/>  
+		</s:fill>
+	</s:Rect>
+	
+	<s:Group verticalCenter="0" horizontalCenter="0">
+		<s:BitmapImage source.unknown="@Embed('assets/embedded/facereclogin/facereglogin-unknown.png')" 
+					   source.approved="@Embed('assets/embedded/facereclogin/facereglogin-approved.png')"
+					   source.denied="@Embed('assets/embedded/facereclogin/facereglogin-denied.png')"
+					   id="image">
+		</s:BitmapImage>
+	</s:Group>
+		
+	<s:Group id="contentGroup" left="10" right="10" top="10" bottom="10">
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+	</s:Group>
+</s:Skin>

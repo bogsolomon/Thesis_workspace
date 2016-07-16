@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="30"
+		   xmlns:controller="com.watchtogether.media.wtdoc.controller.*">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:DocsUserControlController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	<s:BorderContainer id="controlbar" bottom="0" width="400" height="30" borderVisible="true" horizontalCenter="0" cornerRadius="5">
+		<s:Button id = "btnPrev" x="12" y="5" label="&lt;" width="28" click="controller.buttonPrev_clickHandler(event)" enabled="false"
+				  toolTip="Previous Page"/>
+		<s:Button id = "btnNext" x="43" y="5" label="&gt;" width="28" click="controller.buttonNext_clickHandler(event)" enabled="false"
+				  toolTip="Next Page"/>
+		<s:TextInput id="goPage" x="106" y="7" width="30" height="18" textAlign="center" restrict="0-9" maxChars="3"
+					 mouseDown="goPage.text=''"
+					 text="{controller.currentPage}" enter="controller.buttonGo_clickHandler(event)"
+					 enabled="false"/>
+		<s:Label id="slash" text="/" x="140" y="13" width="4"/>
+		<s:Label id="totalPage" text="{controller.totalPages}" x="144" y="13" width="25"/>
+		<s:Button id="zoomIn"  x="181" y="5" width="29" label="+" click="controller.zoomIn(event)" enabled="false"
+				  toolTip="Zoom In"/>
+		<s:Button id="zoomOut"  x="215" y="5" width="28" label="-" click="controller.zoomOut(event)" enabled="false"
+				  toolTip="Zoom Out"/>
+		
+		<s:Button id="fitWidth"  x="251" y="5" width="42" label="&lt;-&gt;" click="controller.fitToWidth(event)" enabled="false"
+				  toolTip="Fit to Width"/>
+		<s:Button id="fitPage"  x="299" y="5" width="52" label="Page" click="controller.fitToHeight(event)" enabled="false"
+				  toolTip="Fit One Page"/>
+		
+		<s:ToggleButton id="maximize" x="353" y="2"  label="Maximized" click="controller.maximize_minimize(event)"
+						skinClass="com.watchtogether.media.common.MaximizeMinimizeButtonSkin"
+						focusIn="event.target.depth=1" focusOut="event.target.depth=0"  enabled="false"/>
+		<!--<s:Button id = "maximize" x="288" y="0" label="Max" width="49" click=""/>-->
+		<!--<s:Label x="161" y="5" height="30" width="65" id="pages" fontSize="14" text="{paperViewer.currentPage}/{paperViewer.pageCount}"/>-->
+	</s:BorderContainer>
+</mx:Module>

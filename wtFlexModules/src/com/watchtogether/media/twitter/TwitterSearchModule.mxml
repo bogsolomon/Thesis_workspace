@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   xmlns:controller="com.watchtogether.media.twitter.controller.*"
+		   layout="absolute" width="596" height="334"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off"
+		   initialize="init(event)">
+	<mx:states>
+		<s:State name="login" />
+		<s:State name="results" />
+	</mx:states>
+	<fx:Declarations>
+		<controller:TwitterSearchController id="controller" view="{this}" />
+		<s:Button id="homeButton" label="Home" click="onHomeButtonClick(event)" />
+		<s:Button id="followingButton" label="Following" click="onFollowingButtonClick(event)" />
+		<s:Button id="followersButton" label="Followers" click="onFollowersButtonClick(event)" />
+		<s:Button id="repliesButton" label="Replies" click="onRepliesButtonClick(event)" />
+		<s:Button id="logoutButton" label="Logout" click="logoutButtonClickHanddler(event)" />
+		<s:Button id="backToLoginButton" label="Back to login" click="returnToLoginView(event)" />
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.twitter.api.data.TwitterUser;
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.code.iface.media.MediaCommandQueue;
+			import com.watchtogether.media.twitter.constants.TwitterConstants;
+			import com.watchtogether.media.twitter.event.TwitterModuleEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.utils.object_proxy;
+			
+			public var publicTimelineTimer:Timer;
+			
+			private function init(event:Event):void
+			{
+				publicTimelineTimer = new Timer(5000);
+				publicTimelineTimer.addEventListener(TimerEvent.TIMER, controller.refreshPublicTimeLine);
+				showUserControls();
+				MainApplication.instance.dispatcher.addEventListener
+					(TwitterModuleEvent.SEARCH_DONE, displaySearchResultsHandler);
+			}
+			
+			private function mediaListItemClickHandler(event:MediaListClickEvent):void
+			{
+				if(event.selectedItem is TwitterUser){
+					var user:TwitterUser = event.selectedItem as TwitterUser;
+					var sentData:String = user.thumbnailUrl + "|" + user.title + "|" + user.subtitle;
+					//NOT MVC, WHOEVERE WROTE THIS SHOULD FIX IT
+//					MediaCommandQueue.instance.addCommandToQueue
+//						(
+//							(this.parentApplication as main).contentViewer.getMediaViewerURL(),
+//							(this.parentApplication as main).contentViewer.getUserControlURL(),
+//							(this.parentApplication as main).contentViewer.getDisplayInfoURL(),
+//							TwitterConstants.SHOW_TWEET,
+//							[user],
+//							true
+//						)
+				}
+				else if(event.selectedItem is TwitterMoreButton){
+					var moreButton:TwitterMoreButton = event.selectedItem as TwitterMoreButton;
+					moreButton.count += 20;
+					if(moreButton.mode == TwitterConstants.HOME_TIMELINE)
+						controller.refeshHomeTimeLine(moreButton.count);
+					if(moreButton.mode == TwitterConstants.REPLIES)
+						controller.refreshReplies(moreButton.count);
+				}
+			}
+			
+			public function showUserControls():void{
+				mediaList.addExtraElement(homeButton);
+				mediaList.addExtraElement(followingButton);
+				mediaList.addExtraElement(followersButton);
+				mediaList.addExtraElement(repliesButton);
+				mediaList.addExtraElement(logoutButton);
+			}
+			
+			public function hideUserControls():void
+			{
+				mediaList.removeExtraElement(homeButton);
+				mediaList.removeExtraElement(followingButton);
+				mediaList.removeExtraElement(followersButton);
+				mediaList.removeExtraElement(repliesButton);
+				mediaList.removeExtraElement(logoutButton);
+			}
+			
+			private function loginButtonClickHandler(event:Event):void
+			{
+				MainApplication.instance.dispatcher.addEventListener
+					(TwitterModuleEvent.LOGIN_ERROR,errorLogin);
+				controller.setAuthentication(userName.text, password.text); 
+				controller.twitterLogin.login();
+				controller.moreResults.mode=TwitterConstants.HOME_TIMELINE;
+				changeToResultsView(null);
+			}
+			
+			private function logoutButtonClickHanddler(event:MouseEvent):void
+			{
+				event.stopPropagation();
+				userName.text = "";
+				password.text = "";
+				controller.moreResults.mode=null;
+				controller.twitterLogin.logout();
+				changeToLoginView(null);
+			}
+			
+			private function onHomeButtonClick(event:MouseEvent):void{
+				event.stopPropagation();
+				controller.moreResults.mode = TwitterConstants.HOME_TIMELINE;
+				controller.moreResults.count = TwitterConstants.DEFAULT_RESULT_COUNT;
+				controller.refeshHomeTimeLine();
+			}
+			
+			private function onFollowingButtonClick(event:MouseEvent):void{
+				event.stopPropagation();
+				controller.moreResults.mode=null;
+				controller.refreshFollowing();
+			}
+			
+			private function onFollowersButtonClick(event:MouseEvent):void{
+				event.stopPropagation();
+				controller.moreResults.mode=null;
+				controller.refreshFollowers();
+			}
+			
+			private function onRepliesButtonClick(event:MouseEvent):void{
+				event.stopPropagation();
+				controller.moreResults.mode=null;
+				controller.moreResults.mode = TwitterConstants.REPLIES;
+				controller.moreResults.count = TwitterConstants.DEFAULT_RESULT_COUNT;
+				controller.refreshReplies();
+			}
+			
+			private function publicTweetsButtonClickHandler(event:MouseEvent):void
+			{
+				hideUserControls();
+				mediaList.addExtraElement(backToLoginButton);
+				controller.refreshPublicTimeLine(null);
+				changeToResultsView(null);
+				publicTimelineTimer.start();
+			}
+			
+			public function displaySearchResultsHandler(event:TwitterModuleEvent):void
+			{
+				var results:ArrayCollection = event.data as ArrayCollection;
+				if(controller.moreResults.mode!=null)results.addItem(controller.moreResults);
+				mediaList.setSearchResults(results);
+			}
+			
+			private function changeToResultsView(event:TwitterModuleEvent):void
+			{
+				currentState = "results";
+				invalidateDisplayList();
+			}
+			
+			private function changeToLoginView(event:TwitterModuleEvent):void{
+				currentState = "login";
+				invalidateDisplayList();
+			}
+			
+			private function returnToLoginView(event:MouseEvent):void{
+				event.stopPropagation();
+				publicTimelineTimer.stop();
+				showUserControls();
+				mediaList.removeExtraElement(backToLoginButton);
+				changeToLoginView(null);
+			}
+			
+			private function errorLogin(event:TwitterModuleEvent):void
+			{
+				MainApplication.instance.dispatcher.removeEventListener
+					(TwitterModuleEvent.LOGIN_ERROR,errorLogin);
+				changeToLoginView(event);
+				publicTimelineTimer.stop();
+				controller.moreResults.mode=null;
+				var label:Label = new Label();
+				label.text = "Login failed, please try again.";
+				label.id = "loginFailLabel";
+				loginGroup.addElementAt(label, 0);
+			}
+		]]>
+	</fx:Script>
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+		skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+		itemClick="mediaListItemClickHandler(event)" viewType="{MediaList.LIST_VIEW}"
+		visible.login="false" visible.results="true" />
+	<s:Group visible.login="true" visible.results="false" width="100%" height="100%">
+		<s:BitmapImage smooth="true" width="100%" height="100%"
+					   source="@Embed('com/watchtogether/media/twitter/images/background.png')"/>
+		<s:Rect height="141" width="212" radiusX="20" horizontalCenter="0" horizontalCenter.login="0" verticalCenter.login="0">
+			<s:fill>
+				<s:SolidColor color="#FFFFFF" alpha="0.5" />
+			</s:fill>
+			<s:stroke>
+				<s:SolidColorStroke color="#FFFFFF" />
+			</s:stroke>
+		</s:Rect>
+		<s:VGroup id="loginGroup" horizontalAlign="center" gap="5" width="100%" verticalCenter="0">
+			<s:Label includeIn="login" text="Username or email" />
+			<s:TextInput id="userName" includeIn="login" enter="loginButtonClickHandler(event)" />
+			<s:Label includeIn="login" x="148" y="99" text="Password" />
+			<s:TextInput id="password" includeIn="login" displayAsPassword="true" enter="loginButtonClickHandler(event)" />
+			<s:HGroup>
+				<s:Button label="Login" click="loginButtonClickHandler(event)" />
+				<s:Button label="Public tweets" click="publicTweetsButtonClickHandler(event)" />
+			</s:HGroup>
+		</s:VGroup>
+	</s:Group>
+</mx:Module>

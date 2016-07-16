@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	
+   	<display-name>${name}_${wt_version}</display-name>
+
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>${name}_${wt_version}</param-value>
+	</context-param>
+	
+    <listener>
+        <listener-class>org.red5.logging.ContextLoggingListener</listener-class>
+    </listener>
+    
+    <filter>
+        <filter-name>LoggerContextFilter</filter-name>
+        <filter-class>org.red5.logging.LoggerContextFilter</filter-class>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>LoggerContextFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+	<servlet>
+		<servlet-name>FileInfoServlet</servlet-name>
+		<servlet-class>com.watchtogether.server.deploy.FileInformationHTTPServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>ServerStatsServlet</servlet-name>
+		<servlet-class>com.watchtogether.server.deploy.ServerStatsServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>FileInfoServlet</servlet-name>
+		<url-pattern>/fileInfo</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>ServerStatsServlet</servlet-name>
+		<url-pattern>/serverStats</url-pattern>
+	</servlet-mapping>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Forbidden</web-resource-name>
+            <url-pattern>/streams/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
+</web-app>

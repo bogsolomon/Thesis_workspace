@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+         
+  <display-name>Chart DataSource WebApp</display-name>
+  
+  <context-param>
+  	<param-name>minDataPointCount</param-name>
+  	<param-value>5</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>maxDataPointCount</param-name>
+  	<param-value>15</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>dataSize</param-name>
+  	<param-value>100</param-value>
+  </context-param>
+  
+  <servlet>
+  	<servlet-name>LineChartDatasource</servlet-name>
+  	<servlet-class>com.watchtogether.chart.datasource.LineChartDatasource</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>SinglePointDatasource</servlet-name>
+  	<servlet-class>com.watchtogether.chart.datasource.SinglePointDatasource</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>LongLineChartDatasource</servlet-name>
+  	<servlet-class>com.watchtogether.chart.datasource.LongLineChartDatasource</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>LineChartDatasource</servlet-name>
+  	<url-pattern>/linechart</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>SinglePointDatasource</servlet-name>
+  	<url-pattern>/singlepoint</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>LongLineChartDatasource</servlet-name>
+  	<url-pattern>/largelinechart</url-pattern>
+  </servlet-mapping>
+</web-app>

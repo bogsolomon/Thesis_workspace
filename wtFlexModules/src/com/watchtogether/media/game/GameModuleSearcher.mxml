@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" 
+		   layout="absolute" width="596" height="334"
+		   xmlns:controller="com.watchtogether.media.game.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   initialize="initializeHandler(event)"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<fx:Declarations>
+		<controller:GameModuleSearchController view="{this}" id="controller"/>
+		<s:Button id="loadGame" label="Load Test Game" click="createNew(event)" />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.events.MediaListClickEvent;
+			
+			import mx.events.FlexEvent;
+			
+			protected function mediaListItemClickHandler(event:MediaListClickEvent):void {
+				
+			}
+			
+			protected function labelSearchResult(item:Object):String {
+				return "";
+			}
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				mediaList.addExtraElement(loadGame);
+			}
+			
+			private function createNew(event:MouseEvent):void
+			{
+				controller.loadGame();
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"
+						 searchLabelFunction="labelSearchResult"/>
+</mx:Module>

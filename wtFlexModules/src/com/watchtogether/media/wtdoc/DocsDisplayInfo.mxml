@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute"
+		   width="424" height="20"
+		   xmlns:controller="com.watchtogether.media.wtdoc.controller.*"
+		   horizontalScrollPolicy="off">
+	<fx:Declarations>
+		<controller:DocsDisplayInfoController view="{this}" id="controller"/>
+	</fx:Declarations>
+	<s:Group width="100%" height="100%">
+		<s:Rect width="100%" height="100%" radiusX="10">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry color="0x444444" />
+					<s:GradientEntry color="0x9E9E9E" />
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+	</s:Group>
+	<s:Label text="" verticalCenter="0" horizontalCenter="0" 
+			 id="descLabel" color="0xFFFFFF" maxWidth="420" maxDisplayedLines="1"/>
+</mx:Module>

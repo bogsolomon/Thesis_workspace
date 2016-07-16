@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   xmlns:controller="com.watchtogether.media.trendRT.controller.*"
+		   layout="absolute" width="596" height="334"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off"
+		   initialize="init(event)">
+	<mx:states>
+		<s:State name="trendView" />
+		<s:State name="tweetView" />
+		<s:State name="clusterView" />
+	</mx:states>
+	<fx:Declarations>
+		<controller:TrendRTSearchController id="controller" view="{this}"/>
+		<s:Button id="backToTrendsButton" label="Back" click="onBackToTrendsButtonClick(event)" />
+		<s:Button id="backToTweetsButton" label="Back" click="onBackToTweetsButtonClick(event)" />
+		<s:Label id="trendLabel" fontSize="16" color="#084B8A" fontWeight="bold" />
+		<s:Label id="clusterLabel" fontSize="16" color="#084B8A" fontWeight="bold" />
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.twitter.api.data.TwitterUser;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.code.iface.media.MediaCommandQueue;
+			import com.watchtogether.media.trendRT.api.Trend;
+			import com.watchtogether.media.twitter.constants.TwitterConstants;
+			
+			private function init(event:Event):void{
+				tweetMedialist.addExtraElement(trendLabel);
+				tweetMedialist.addExtraElement(backToTrendsButton);
+				tweetClusterMedialist.addExtraElement(clusterLabel);
+				tweetClusterMedialist.addExtraElement(backToTweetsButton);
+				controller.refreshTrendList();
+			}
+			
+			private function mediaListItemClickHandler(event:MediaListClickEvent):void{
+				if(event.selectedItem is Trend)
+				{
+					controller.setAllowedHide(false);
+					controller.refreshTweetsList(event.selectedItem as Trend);
+					trendLabel.text = "Trend: " +(event.selectedItem as Trend).displayName;
+					currentState = "tweetView";
+					invalidateDisplayList();
+				}
+				else if(event.selectedItem is TwitterUser && currentState == "tweetView")
+				{
+					// for new show the same results form the tweet view.
+					controller.setAllowedHide(true);
+					tweetClusterMedialist.setSearchResults(tweetMedialist.searchResultDataProvider);
+					clusterLabel.text = "Cluster: " +(event.selectedItem as TwitterUser).name;
+					currentState = "clusterView";
+					invalidateDisplayList();
+					
+				}
+				else if(event.selectedItem is TwitterUser && currentState == "clusterView" )
+				{
+					controller.setAllowedHide(false);
+						var user:TwitterUser = event.selectedItem as TwitterUser;
+						var sentData:String = user.thumbnailUrl + "|" + user.title + "|" + user.subtitle;
+						//DON'T CARE WHO WROTE THIS BUT THIS IS NOT MVC
+//						MediaCommandQueue.instance.addCommandToQueue
+//							(
+//								contentViewer.getMediaViewerURL(),
+//								contentViewer.getUserControlURL(),
+//								contentViewer.getDisplayInfoURL(),
+//								TwitterConstants.SHOW_TWEET,
+//								[user],
+//								true
+//							)
+				}
+				event.stopPropagation();
+			}
+			
+			private function onBackToTrendsButtonClick(event:MouseEvent):void{
+				event.stopPropagation();
+				currentState = "trendView";
+				invalidateDisplayList();
+			}
+			
+			private function onBackToTweetsButtonClick(event:MouseEvent):void{
+				event.stopPropagation();
+				currentState = "tweetView";
+				invalidateDisplayList();
+			}
+		]]>
+	</fx:Script>
+	<mx:transitions>
+		<s:Transition fromState="trendView" toState="tweetView">
+			<s:Parallel>
+				<s:Move target="{trendMediaList}" xFrom="0" xTo="-650" />
+				<s:Move target="{tweetMedialist}" xFrom="650" xTo="0" />
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="tweetView" toState="trendView">
+			<s:Parallel>
+				<s:Move target="{trendMediaList}" xFrom="-650" xTo="0" />
+				<s:Move target="{tweetMedialist}" xFrom="0" xTo="650" />
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="tweetView" toState="clusterView">
+			<s:Parallel>
+				<s:Move target="{tweetMedialist}" xFrom="0" xTo="-650" />
+				<s:Move target="{tweetClusterMedialist}" xFrom="650" xTo="0" />
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="clusterView" toState="tweetView">
+			<s:Parallel>
+				<s:Move target="{tweetMedialist}" xFrom="-650" xTo="0" />
+				<s:Move target="{tweetClusterMedialist}" xFrom="0" xTo="650" />
+			</s:Parallel>
+		</s:Transition>
+	</mx:transitions>
+	<medialist:MediaList id="tweetClusterMedialist" controller="{this.controller}"
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)" viewType="{MediaList.LIST_VIEW}"
+						 x.tweetView="650" x.clusterView="0"
+						 visible.trendView="false" visible.tweetView="true" visible.clusterView="true" />
+	<medialist:MediaList id="tweetMedialist" controller="{this.controller}"
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)" viewType="{MediaList.LIST_VIEW}"
+						 x.tweetView="0" x.clusterView="-650" x.trendView="650"
+						 visible.trendView="true" visible.tweetView="true" visible.clusterView="true" />
+	<medialist:MediaList id="trendMediaList" controller="{this.controller}"
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)" viewType="{MediaList.LIST_VIEW}"
+						 x.trendView="0" x.tweetView="-650"
+						 visible.trendView="true" visible.tweetView="true" visible.clusterView="false" />
+</mx:Module>

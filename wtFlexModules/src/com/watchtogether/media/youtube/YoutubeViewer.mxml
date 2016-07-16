@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="608" height="428"
+		   xmlns:controller="com.watchtogether.media.youtube.controller.*"
+		   creationComplete="controller.init()"
+		   >
+		   <!--removed="controller.remove()"-->
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:YoutubeViewerController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	<mx:SWFLoader id="ytswf" width="100%" alpha="1" init="controller.onLoaderInit(event)" autoLoad="true"
+				  horizontalCenter="0"/>
+</mx:Module>

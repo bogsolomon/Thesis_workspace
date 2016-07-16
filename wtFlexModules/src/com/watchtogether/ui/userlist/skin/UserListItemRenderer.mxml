@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				autoDrawBackground="false"
+				width="100%" xmlns:skin="com.watchtogether.ui.userlist.skin.*" xmlns:maps="com.watchtogether.media.common.maps.*">
+
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.constants.DeploymentConstants;
+			import com.watchtogether.code.events.UserInfoEvent;
+			import com.watchtogether.code.iface.login.AbstractLocation;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.code.iface.login.LoginInterface;
+			import com.watchtogether.ui.userlist.UserList;
+			import com.watchtogether.ui.userlist.UserListEvent;
+			
+			import mx.controls.Alert;
+			import mx.controls.SWFLoader;
+			import mx.events.EffectEvent;
+			import mx.utils.object_proxy;
+			
+			private var imgLoader:SWFLoader = new SWFLoader();
+			[Bindable]
+			private var isExpanded:Boolean = false;
+			
+			protected function clickHandler(event:MouseEvent):void
+			{
+				if (MainApplication.instance.login.loggedInUser.isBoss ||
+					MainApplication.instance.session.othersControl) {
+				
+					var index:int = MainApplication.instance.sessionListDataProvider.getItemIndex(data);
+					
+					if (!data.inSession && index == -1 && data.online) {
+						if (!MainApplication.instance.mediaServerConnection.waitingForSynch) {
+							var login:LoginInterface = MainApplication.instance.login;
+							MainApplication.instance.mediaServerConnection.call("roomService.inviteUser", null, data.uid+"");
+							
+							MainApplication.instance.sessionListDataProvider.addItem(data);
+							MainApplication.instance.dispatcher.dispatchEvent(new Event("sessionChanged"));
+						} else {
+							Alert.show("Waiting for session info before you can invite.");
+						}
+					}
+				}
+			}
+			
+			override public function set data(inObject:Object):void{
+				if (inObject != null) {
+					super.data = inObject;
+					
+					image.source = inObject.pic;
+	//				imgLoader.addEventListener(Event.COMPLETE, onUserImageLoaded);
+	//				imgLoader.load(imgSource);
+					
+					MainApplication.instance.dispatcher.addEventListener(UserInfoEvent.USER_INFO_CHANGED, handleUserInfoChanged);
+					MainApplication.instance.dispatcher.addEventListener(UserListEvent.EXPAND_USER_ITEM, handleItemExpand);
+					MainApplication.instance.dispatcher.addEventListener(UserListEvent.COLLAPSE_USER_ITEM, handleItemCollapse);
+				} else {
+					MainApplication.instance.dispatcher.removeEventListener(UserInfoEvent.USER_INFO_CHANGED, handleUserInfoChanged);
+					MainApplication.instance.dispatcher.removeEventListener(UserListEvent.EXPAND_USER_ITEM, handleItemExpand);
+					MainApplication.instance.dispatcher.removeEventListener(UserListEvent.COLLAPSE_USER_ITEM, handleItemCollapse);
+				}
+			}
+			
+			private function handleUserInfoChanged(event:UserInfoEvent):void {
+				if (event.userId == data.uid){
+					this.validateNow();
+				}
+				
+				if (parent != null) {
+					var list:UserList = parentDocument.parentDocument.hostComponent;
+					list.userListDataProvider.refresh();
+				}
+			}
+			
+//			private function onUserImageLoaded( e:Event ):void {
+//				image.source = imgLoader.content;
+//			}
+			
+			private function toggleExtendedData(event:MouseEvent):void
+			{
+				var list:UserList = parentDocument.parentDocument.hostComponent;
+				var user:AbstractUser = data as AbstractUser;
+				if(isExpanded)
+				{
+					list.clearSelection();
+					var userEvent:UserListEvent =new UserListEvent(UserListEvent.COLLAPSE_USER_ITEM);
+					userEvent.userId = data.uid;
+					MainApplication.instance.dispatcher.dispatchEvent(userEvent);
+				}
+				else
+				{
+					list.setSelection(data as AbstractUser);
+				}
+				event.stopPropagation();
+			}
+			private function handleItemExpand(event:UserListEvent):void
+			{
+				var user:AbstractUser = data as AbstractUser;
+				if(user.uid == event.userId)
+				{
+					resizeUserListItem.stop();
+					resizeUserListItem.heightTo = 178;
+					resizeUserListItem.play();
+					moreDataGroup.height = 178;
+					isExpanded = true;
+				}
+				else
+				{
+					resizeUserListItem.stop();
+					resizeUserListItem.heightTo = 0;
+					resizeUserListItem.play();
+					moreDataGroup.height = 0;
+					isExpanded = false;
+				}
+			}
+			
+			private function smoothImage(evt:Event):void{
+				var myBitmap:Bitmap = ((evt.target as Image).content as Bitmap);
+				if (myBitmap != null) {
+					myBitmap.smoothing = true;
+				}
+			}
+			
+			private function handleItemCollapse(event:UserListEvent):void
+			{
+				if(isExpanded)
+				{
+					resizeUserListItem.stop();
+					resizeUserListItem.heightTo = 0;
+					resizeUserListItem.play();
+					moreDataGroup.height = 0;
+					isExpanded = false;
+				}
+			}
+		]]>
+	</fx:Script>	
+	<fx:Declarations>
+		<s:Resize id="resizeUserListItem" target="{moreDataGroup}"/>
+	</fx:Declarations>
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="#FFFFFF" />
+				<s:GradientEntry color="#C8C8C8" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	<s:HGroup id="userListItem"
+			  doubleClickEnabled="false"
+			  click="clickHandler(event)"
+			  verticalAlign="middle"
+			  paddingTop="5"
+			  paddingBottom="5"
+			  paddingLeft="10"
+			  paddingRight="10"
+			  width="100%" height="90"
+			  gap="10">
+		<!-- alpha="{DeploymentConstants.userListAlpha}" -->
+		<s:Group height="80" width="80" verticalCenter="0" horizontalCenter="0">
+			<!-- Green -->
+			<s:Rect width="100%" height="100%" radiusX="5"
+					visible="{!(!data.online || data.inSession)}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#007000" />
+						<s:GradientEntry color="#00B300" />
+					</s:LinearGradient>
+				</s:fill>
+				<s:stroke>
+					<s:LinearGradientStroke rotation="90" weight="2">
+						<s:GradientEntry color="#00C300" />
+						<s:GradientEntry color="#008000" />
+					</s:LinearGradientStroke>
+				</s:stroke>
+				<s:filters>
+					<s:DropShadowFilter distance="3" color="#000000" alpha="0.75" />
+				</s:filters>
+			</s:Rect>
+			<!-- Red
+			<s:Rect width="100%" height="100%" radiusX="5"
+					visible="{(data.online_presence == AbstractUser.ONLINE_PRESENCE_ACTIVE) && !data.online}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#8C0E00" />
+						<s:GradientEntry color="#D11500" />
+					</s:LinearGradient>
+				</s:fill>
+				<s:stroke>
+					<s:LinearGradientStroke rotation="90" weight="2">
+						<s:GradientEntry color="#E12500" />
+						<s:GradientEntry color="#9C1E00" />
+					</s:LinearGradientStroke>
+				</s:stroke>
+				<s:filters>
+					<s:DropShadowFilter distance="3" color="#000000" alpha="0.75" />
+				</s:filters>
+			</s:Rect>
+			-->
+			<!-- Blue -->
+			<s:Rect width="100%" height="100%" radiusX="5"
+					visible="{!(data.online || data.online_presence != AbstractUser.ONLINE_PRESENCE_ACTIVE)}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#072D4F" />
+						<s:GradientEntry color="#2C709A" />
+					</s:LinearGradient>
+				</s:fill>
+				<s:stroke>
+					<s:LinearGradientStroke rotation="90" weight="2">
+						<s:GradientEntry color="#3C80AA" />
+						<s:GradientEntry color="#173D5F" />
+					</s:LinearGradientStroke>
+				</s:stroke>
+				<s:filters>
+					<s:DropShadowFilter distance="3" color="#000000" alpha="0.75" />
+				</s:filters>
+			</s:Rect>
+			<!-- Amber -->
+			<s:Rect width="100%" height="100%" radiusX="5"
+					visible="{data.inSession || !(data.online_presence != AbstractUser.ONLINE_PRESENCE_IDLE || data.online)}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#FFB000" />
+						<s:GradientEntry color="#FFD900" />
+					</s:LinearGradient>
+				</s:fill>
+				<s:stroke>
+					<s:LinearGradientStroke rotation="90" weight="2">
+						<s:GradientEntry color="#FFE900" />
+						<s:GradientEntry color="#FFC000" />
+					</s:LinearGradientStroke>
+				</s:stroke>
+				<s:filters>
+					<s:DropShadowFilter distance="3" color="#000000" alpha="0.75" />
+				</s:filters>
+			</s:Rect>
+			<!-- Gray -->
+			<s:Rect width="100%" height="100%" radiusX="5"
+					visible="{!(!(data.online_presence == AbstractUser.ONLINE_PRESENCE_OFFLINE ||
+					data.online_presence == AbstractUser.ONLINE_PRESENCE_Error|| data.online_presence == '') || data.online)}">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#444444" />
+						<s:GradientEntry color="#9E9E9E" />
+					</s:LinearGradient>
+				</s:fill>
+				<s:stroke>
+					<s:LinearGradientStroke rotation="90" weight="2">
+						<s:GradientEntry color="#AEAEAE" />
+						<s:GradientEntry color="#545454" />
+					</s:LinearGradientStroke>
+				</s:stroke>
+				<s:filters>
+					<s:DropShadowFilter distance="3" color="#000000" alpha="0.75" />
+				</s:filters>
+			</s:Rect>
+			<mx:Image id="image" width="70" height="70"
+					  verticalAlign="middle" horizontalAlign="center"
+					  horizontalCenter="0" verticalCenter="0"
+					  trustContent="true" smoothBitmapContent="true">
+				<mx:filters>
+					<mx:DropShadowFilter distance="1"  color="#000000" alpha="0.75" />
+				</mx:filters>
+			</mx:Image>
+			<s:Rect top="0" bottom="5" left="0" right="1" radiusX="5">
+				<s:fill>
+					<s:LinearGradient rotation="90">
+						<s:GradientEntry color="#FFFFFF" alpha="0.90" />
+						<s:GradientEntry color="#FFFFFF" alpha="0" ratio="0.20" />
+					</s:LinearGradient>
+				</s:fill>
+			</s:Rect>
+		</s:Group>
+		<s:VGroup horizontalAlign="left">
+			<s:Label text="{data.first_name+' '+data.last_name}"
+					 left="100" fontSize="14"
+					 fontWeight="bold" color="#3B5998"/>
+			<s:Label id="userStatus" text="{data.status}" fontWeight="bold"
+					 color="#8E8E8E" fontStyle="italic" fontSize="12" />
+			<s:Group left="100">
+				<s:Label text="Available" visible="{!(!data.online || data.inSession)}" />
+				<s:Label text="Online but not in WT" visible="{!(data.online || data.online_presence != AbstractUser.ONLINE_PRESENCE_ACTIVE)}" />
+				<s:Label text="Idle" visible="{!(data.online_presence != AbstractUser.ONLINE_PRESENCE_IDLE || data.online)}" />
+				<s:Label text="Offline" visible="{!(!(data.online_presence == AbstractUser.ONLINE_PRESENCE_OFFLINE ||
+						 data.online_presence == AbstractUser.ONLINE_PRESENCE_Error || data.online_presence == '' ) || data.online)}" />
+				<s:Label text="Busy" visible="{data.inSession}" />
+			</s:Group>
+		</s:VGroup>
+	</s:HGroup>
+	<s:VGroup horizontalAlign="center" top="25" right="10" mouseUp="toggleExtendedData(event)">
+		<s:BitmapImage source="@Embed('com/watchtogether/ui/userlist/skin/images/map.png')"
+					   smooth="true" width="32" height="32" />
+		<s:Label text="Geo-Location" />
+	</s:VGroup>
+
+	<!-- Popout container with map -->
+	<s:Group id="moreDataGroup" top="95" bottom="5" left="10" right="10" visible="{isExpanded}">
+		<maps:UserListMap data="{data}"/>
+	</s:Group>
+	
+</s:ItemRenderer>

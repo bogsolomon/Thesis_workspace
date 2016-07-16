@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:controller="com.watchtogether.media.flickr.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   layout="absolute" width="596" height="334"
+		   initialize="initializeHandler(event)"
+		   creationComplete="controller.initFlickrService();"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<fx:Declarations>
+		<controller:FlickrSearchController id="controller" view="{this}"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			
+			import mx.events.FlexEvent;
+			
+			import spark.components.Button;
+			import spark.components.RadioButton;
+			import spark.events.TrackBaseEvent;
+			
+			public var tagSearch:RadioButton;
+			public var usernameSearch:RadioButton;
+			public var slideShowButton:Button;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				tagSearch = new RadioButton();
+				tagSearch.label = "By Tag";
+				tagSearch.groupName = "radiogroup1";
+				tagSearch.enabled = true;
+				tagSearch.selected = true;
+				
+				mediaList.addExtraElement(tagSearch);
+				
+				usernameSearch = new RadioButton();
+				usernameSearch.label = "By User";
+				usernameSearch.groupName = "radiogroup1";
+				usernameSearch.enabled = true;
+				usernameSearch.selected = false;
+				
+				mediaList.addExtraElement(usernameSearch);
+				
+				slideShowButton = new Button();
+				slideShowButton.label = "SlideShow";
+				slideShowButton.addEventListener(MouseEvent.CLICK, controller.initSlideShow);
+				slideShowButton.height = 22;
+				
+				mediaList.addExtraElement(slideShowButton);
+				mediaList.list.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_DRAG, listDragStart);
+				mediaList.list.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_RELEASE, listDragComplete);
+				
+				mediaList.searchInput.text = "satellite imagery";
+			}
+			
+			private function listDragStart(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = false;
+			}
+			
+			private function listDragComplete(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = true;
+			}
+			
+			protected function mediaListItemClickHandler(event:MediaListClickEvent):void
+			{
+				var _data:Object = event.selectedItem;
+				
+				controller.initSinglePhoto(_data);
+			}
+			
+			protected function labelSearchResult(item:Object):String {
+				return item.suggestion.data;
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"
+						 searchLabelFunction="labelSearchResult"/>
+	
+</mx:Module>

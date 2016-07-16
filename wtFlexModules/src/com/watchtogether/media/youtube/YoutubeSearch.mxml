@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" 
+		   layout="absolute" width="596" height="334"
+		   xmlns:controller="com.watchtogether.media.youtube.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   initialize="initializeHandler(event)"
+		   creationComplete="controller.initYoutubeService();"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off">
+
+	<fx:Declarations>
+		<controller:YoutubeSearchController view="{this}" id="controller"/>
+	</fx:Declarations>
+
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.code.iface.media.MediaCommandQueue;
+			import com.watchtogether.media.youtube.constants.YoutubeConstants;
+			import com.watchtogether.ui.contentViewer.ContentViewer;
+			import com.watchtogether.ui.medialist.skin.MediaListSkin;
+			
+			import mx.events.DragEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ModuleEvent;
+			import mx.events.ScrollEvent;
+			import mx.modules.ModuleLoader;
+			
+			import spark.components.ComboBox;
+			import spark.components.DropDownList;
+			import spark.events.IndexChangeEvent;
+			import spark.events.TrackBaseEvent;
+			
+			public var videoCategoriesCombo:DropDownList;
+			public var timeOptionsCombo:DropDownList;
+			
+			private var _data:Object;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				timeOptionsCombo = new DropDownList();
+				timeOptionsCombo.id = "timeOptionsCombo";
+				timeOptionsCombo.enabled = true;
+				timeOptionsCombo.selectedIndex = 0;
+				timeOptionsCombo.dataProvider = controller.timeFrameArray;
+				timeOptionsCombo.width = 94;
+				timeOptionsCombo.addEventListener(IndexChangeEvent.CHANGE, controller.timeFrameSelected);
+				
+				mediaList.addExtraElement(timeOptionsCombo);
+				
+				videoCategoriesCombo = new DropDownList();
+				videoCategoriesCombo.id = "videoCategoriesCombo";
+				videoCategoriesCombo.enabled = true;
+				videoCategoriesCombo.selectedIndex = 0;
+				videoCategoriesCombo.dataProvider = controller.moviesOptionsArray;
+				videoCategoriesCombo.addEventListener(IndexChangeEvent.CHANGE, controller.movieCategorySelected);
+				videoCategoriesCombo.width = 124;
+				
+				mediaList.addExtraElement(videoCategoriesCombo);
+				
+				mediaList.list.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_DRAG, listDragStart);
+				mediaList.list.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_RELEASE, listDragComplete);
+				
+				mediaList.searchInput.text = "intelligence gathering";
+			}
+
+			private function listDragStart(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = false;
+			}
+			
+			private function listDragComplete(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = true;
+			}
+			
+			protected function mediaListItemClickHandler(event:MediaListClickEvent):void
+			{
+				var dataToSend:Object = new Object();
+				
+				_data = event.selectedItem;
+				dataToSend.id = _data.id;
+				dataToSend.title = _data.title;
+				
+				var contentViewer:ContentViewer = MainApplication.instance.localSelectedContentViewer;
+				MainApplication.instance.remote_selected_desktop = -1;
+				
+				MediaCommandQueue.instance.addCommandToQueue(contentViewer.getMediaViewerURL(), 
+					contentViewer.getUserControlURL(),
+					contentViewer.getDisplayInfoURL(),
+					YoutubeConstants.CUE_VIDEO, [dataToSend], true);
+			}
+			
+			protected function labelSearchResult(item:Object):String {
+				return item.suggestion.data;
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"
+						 searchLabelFunction="labelSearchResult"/>
+	
+</mx:Module>

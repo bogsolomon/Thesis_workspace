@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  creationComplete="init()">
+	<fx:Metadata>
+		[Event(name="itemClick", type="com.watchtogether.code.events.MediaListClickEvent")]
+		[SkinState("searching")]
+		[SkinState("listView")]
+		[SkinState("iconView")]
+		[SkinState("noresults")]
+	</fx:Metadata>
+	<s:states>
+		<s:State name="searching" enterState="invalidateSkinState()" />
+		<s:State name="listView" enterState="invalidateSkinState()" />
+		<s:State name="iconView" enterState="invalidateSkinState()" />
+		<s:State name="noresults" enterState="invalidateSkinState()" />
+	</s:states>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.Configurator;
+			import com.watchtogether.code.iface.media.SearchController;
+			import com.watchtogether.ui.autoComplete.AutoComplete;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.Sort;
+			import mx.core.IVisualElement;
+			
+			import spark.components.Button;
+			import spark.components.HGroup;
+			import spark.components.List;
+			import spark.components.TextInput;
+
+			[SkinPart(required="true")]
+			public var extraComponents:HGroup;
+			[SkinPart(required="true")]
+			public var searchInput:AutoComplete;
+			[SkinPart(required="true")]
+			public var searchBtn:Button;
+			[SkinPart(required="true")]
+			public var list:List;
+			[Bindable]
+			public var controller:SearchController;
+			
+			[Bindable]
+			public var searchResultDataProvider:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			public var autoCompleteDataProvider:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			public var searchLabelFunction:Function = new Function();
+			
+			[Bindable]
+			public var searchFilterFunction:Function = new Function();
+			
+			[Bindable]
+			public var sort:Sort = new Sort();
+			
+			[Bindable]
+			public var viewType:String = "iconView";
+			
+			public static const ICON_VIEW:String = "iconView";
+			public static const LIST_VIEW:String = "listView";
+			
+			private function init():void
+			{
+				this.searchInput.labelFunction = searchLabelFunction;
+				autoCompleteDataProvider.filterFunction = searchFilterFunction;
+				autoCompleteDataProvider.sort = sort;
+				autoCompleteDataProvider.refresh();
+			}
+			
+			public function reinitAutoComplete():void {
+				this.searchInput.labelFunction = searchLabelFunction;
+				this.searchInput.text = "";
+				autoCompleteDataProvider.filterFunction = searchFilterFunction;
+				autoCompleteDataProvider.sort = sort;
+				autoCompleteDataProvider.refresh();
+			}
+			
+			public function search(searchStr:String):void {
+				this.currentState = "searching";
+				controller.search(searchStr);
+			}
+			
+			public function textChanged(searchStr:String):void {
+				controller.getAutoCompleteDataProvider(searchStr);
+			}
+			
+			public function setSearchResults(searchResults:ArrayCollection):void {
+				searchResultDataProvider.removeAll();
+				
+				if (searchResults.length == 0) {
+					
+					this.currentState = "noresults";
+				} else {
+					searchResultDataProvider.addAll(searchResults);
+					this.currentState = viewType;
+				}
+			}
+			
+			override protected function getCurrentSkinState():String {
+				return currentState;
+			}
+			
+			public function addExtraElement(element:IVisualElement):void {
+				extraComponents.addElement(element);
+			}
+			
+			public function hideSearch():void {
+				searchInput.visible = false;
+				searchBtn.visible = false;
+			}
+			
+			public function removeExtraElement(element:IVisualElement):void{
+				try{
+					extraComponents.removeElement(element);
+				}
+				catch(e:Error){}
+			}
+			
+			override public function setFocus():void {
+				searchInput.inputTxt.setFocus();
+			}
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>

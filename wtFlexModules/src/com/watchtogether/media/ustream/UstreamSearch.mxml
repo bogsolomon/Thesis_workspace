@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="596" height="334"
+		   xmlns:controller="com.watchtogether.media.ustream.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   creationComplete="controller.initUstreamSearch()"
+		   verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	<fx:Declarations>
+		<controller:UstreamSearchController view="{this}" id="controller"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.code.iface.media.MediaCommandQueue;
+			import com.watchtogether.media.ustream.constants.UstreamConstants;
+			import com.watchtogether.ui.contentViewer.ContentViewer;
+			
+			protected function mediaListItemClickHandler(event:MediaListClickEvent):void
+			{
+				var video:UstreamVideoModel = event.selectedItem as UstreamVideoModel;
+				
+				var contentViewer:ContentViewer = MainApplication.instance.localSelectedContentViewer;
+				
+				MainApplication.instance.remote_selected_desktop = -1;
+				
+				MediaCommandQueue.instance.addCommandToQueue(contentViewer.getMediaViewerURL(), 
+					contentViewer.getUserControlURL(),
+					contentViewer.getDisplayInfoURL(),
+					UstreamConstants.PLAY_CHANNEL, [video], true);
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList id="mediaList" controller="{this.controller}"
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"/>
+</mx:Module>

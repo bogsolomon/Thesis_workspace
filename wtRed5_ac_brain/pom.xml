@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.watchtogether</groupId>
+  <artifactId>wtRed5_ac_brain</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1</version>
+  <name>WatchTogetherServer</name> 
+  <url>http://maven.apache.org</url>
+  <dependencies>
+  	<dependency>
+    	<groupId>com.watchtogether</groupId>
+ 		<artifactId>wtRed5_cloud_gateway_common</artifactId>
+ 		<version>0.0.1-SNAPSHOT</version>
+    </dependency>
+	<dependency>
+		<groupId>org.red5</groupId>
+		<artifactId>red5-server</artifactId>
+		<version>1.0.7-RELEASE</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.red5</groupId>
+		<artifactId>red5-client</artifactId>
+		<version>1.0.7-RELEASE</version>
+		<scope>provided</scope>
+	</dependency>
+	  <dependency>
+		<groupId>org.jgroups</groupId>
+		<artifactId>jgroups</artifactId>
+		<version>3.6.9.Final</version>
+	  </dependency>
+		
+	<dependency>
+		<groupId>com.watchtogether</groupId>
+		<artifactId>wtRed5_common</artifactId>
+		<version>0.0.1</version>
+	</dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+          	<phase>package</phase>
+            <configuration>
+              <tasks>
+				<copy file="target/${finalName}/WEB-INF/classes/logback.xml" tofile="target/${finalName}/WEB-INF/classes/logback-${finalName}.xml" overwrite="true" />
+				<delete file="target/${finalName}/WEB-INF/classes/logback.xml"/>
+				<delete includeEmptyDirs="true">
+					<fileset dir="target/${finalName}/META-INF"/>
+				</delete>
+				<delete file="target/${finalName}.war"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-war-plugin</artifactId>
+      	<version>2.0.2</version>
+      	<configuration>
+          <packagingExcludes>META-INF</packagingExcludes>
+          <archive><addMavenDescriptor>false</addMavenDescriptor></archive>
+          <webResources>
+          	<resource>
+				<directory>src/main/webapp</directory>
+				<filtering>true</filtering>
+          	</resource>
+          </webResources>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+    </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <finalName>wtRed5_${wt_version}</finalName>
+  </build>
+  <properties>
+  	<wt_version>ac_brain</wt_version>
+  	<finalName>wtRed5_${wt_version}</finalName>
+  </properties>
+  <!--  >repositories>
+   <repository>
+       <id>JBOSS</id>
+       <name>JBoss Repository</name>
+       <url>http://repository.jboss.org/maven2/</url>
+   </repository>
+  </repositories-->
+</project>

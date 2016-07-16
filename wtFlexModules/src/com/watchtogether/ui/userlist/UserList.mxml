@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  creationComplete="init()">
+	<fx:Metadata>
+		[Event(name="groupChanged", type="com.watchtogether.code.events.GroupChangeEvent")]
+	</fx:Metadata>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.code.iface.login.LoginInterface;
+			import com.watchtogether.ui.autoComplete.AutoComplete;
+			import com.watchtogether.ui.autoComplete.CustomEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.utils.ObjectUtil;
+			
+			import spark.components.List;
+			
+			[Bindable]
+			public var label:String = "";
+			
+			[Bindable]
+			public var multipleGroups:Boolean = false;
+			
+			[Bindable]
+			public var userListDataProvider:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			public var groupDataProvider:ArrayCollection = new ArrayCollection();
+			
+			[SkinPart(required="true")]
+			public var autoComplete:AutoComplete;
+			[SkinPart(required="true")]
+			public var users:List;
+			
+			private var _filterText:String = "";
+			private var _selecting:Boolean = false;
+			private var userId:Number = 0;
+			private var visibleIndex:Number = 0;
+			private var myTimer:Timer = new Timer(250,1);
+			private var myTimer2:Timer = new Timer(250,1);
+			
+			private function init():void
+			{
+				this.autoComplete.labelFunction = userListLabelFunction;
+				userListDataProvider.sort = userListSortByName();
+				userListDataProvider.filterFunction = userListFilterByName;
+				autoComplete.addEventListener(CustomEvent.SELECT, handleAutoCompleteItemSelected);
+				userListDataProvider.refresh();
+			}
+			
+			private function handleAutoCompleteItemSelected(event:CustomEvent):void
+			{
+				if (MainApplication.instance.login.loggedInUser.isBoss ||
+					MainApplication.instance.session.othersControl) {
+					
+					var user:AbstractUser = event.data as AbstractUser;
+					
+					if (!user.inSession && user.online) {
+						var login:LoginInterface = MainApplication.instance.login;
+						MainApplication.instance.mediaServerConnection.call("roomService.inviteUser", null, user.uid+"");
+						
+						MainApplication.instance.sessionListDataProvider.addItem(user);
+						MainApplication.instance.dispatcher.dispatchEvent(new Event("sessionChanged"));
+					}
+				}
+			}
+			
+			public static function userListSortByName():Sort
+			{
+				var sort:Sort = new Sort();
+				sort.fields = [new SortField("online_presence"), new SortField("online"), new SortField("inSession"), new SortField("first_name")];
+				sort.compareFunction = compareUsers;
+				return sort;
+			}
+			
+			public static function compareUsers(obj1:Object, obj2:Object, fields:Array = null):int {
+				var comparison:int = 0;
+				
+				var user1:AbstractUser = (obj1 as AbstractUser);
+				var user2:AbstractUser = (obj2 as AbstractUser);
+				
+				if (user1.inSession) {
+					if (user2.inSession) {
+						comparison = compareNames(user1.first_name, user2.first_name);
+						trace("case 1:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					} else if (user2.online) {
+						comparison = 1;
+						trace("case 2:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					} else {
+						comparison = -1;
+						trace("case 3:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					}
+				} else if (user1.online) {
+					if (user2.online) {
+						comparison = compareNames(user1.first_name, user2.first_name);
+						trace("case 4:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					} else {
+						comparison = -1;
+						trace("case 5:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					}
+				} else if (user1.online_presence == AbstractUser.ONLINE_PRESENCE_ACTIVE) {
+					if (user2.online_presence == AbstractUser.ONLINE_PRESENCE_ACTIVE) {
+						comparison = compareNames(user1.first_name, user2.first_name);
+						trace("case 6:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					} else {
+						comparison = -1;
+						trace("case 7:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					}
+				} else {
+					if (user2.inSession || user2.online) {
+						comparison = 1;
+						trace("case 8:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					} else {
+						comparison = compareNames(user1.first_name, user2.first_name);
+						trace("case 9:"+user1.first_name+" - "+user2.first_name+":"+comparison);
+					}
+				}
+				
+				return comparison;
+			}
+			
+			private static function compareNames(name1:String, name2:String):int {
+				return ObjectUtil.stringCompare(name1, name2);
+			}
+			
+			public function userListFilterByName(user:AbstractUser):Boolean
+			{
+				var out:Boolean = false;
+				if(!_selecting)
+				{
+					_filterText = autoComplete.text.toLowerCase();
+				}
+				
+				if(_filterText.length == 0) out = true;
+				else
+				{
+					var userLastName:String = user.last_name.toLowerCase();
+					var userFirstName:String = user.first_name.toLowerCase();
+					
+					if(userFirstName.search(_filterText) == 0) out = true;
+					if(userLastName.search(_filterText) == 0) out = true;
+				}
+				
+				if(!out)
+				{
+					var completeName:String = userFirstName + " " + userLastName;
+					if(completeName.search(_filterText) == 0) out = true;
+				}
+				
+				return out;
+			}
+			
+			public function userListLabelFunction(item:Object):String
+			{
+				var data:AbstractUser = item as AbstractUser;
+				var out:String = data["first_name"] + " " + data["last_name"];
+				return out;
+			}
+			
+			public function setSelection(user:AbstractUser):void
+			{
+				visibleIndex = userListDataProvider.getItemIndex(user);
+				_selecting = true;
+				_filterText = user.first_name + " " + user.last_name;
+				_filterText = _filterText.toLowerCase();
+				userListDataProvider.refresh();
+				_selecting = false;
+				userId = user.uid;
+				myTimer.addEventListener(TimerEvent.TIMER_COMPLETE,delayedItemExpend);
+				myTimer.start();
+			}
+			
+			public function clearSelection():void
+			{
+				userId = 0;
+				_filterText = "";
+				userListDataProvider.refresh();
+				myTimer.addEventListener(TimerEvent.TIMER_COMPLETE,delayedItemClear);
+				myTimer.start();
+			}
+			
+			private function delayedItemExpend(event:Event):void
+			{
+				var userEvent:UserListEvent =new UserListEvent(UserListEvent.EXPAND_USER_ITEM);
+				userEvent.userId = userId;
+				MainApplication.instance.dispatcher.dispatchEvent(userEvent);
+				myTimer.removeEventListener(TimerEvent.TIMER_COMPLETE,delayedItemExpend);
+			}
+			
+			private function delayedItemClear(event:Event):void
+			{
+				userListDataProvider.refresh();
+				
+				myTimer2.addEventListener(TimerEvent.TIMER_COMPLETE,delayedItemClear2);
+				myTimer2.start();
+				myTimer.removeEventListener(TimerEvent.TIMER_COMPLETE,delayedItemClear);
+			}
+			
+			private function delayedItemClear2(event:Event):void
+			{
+				if (visibleIndex * 95 >  users.scroller.verticalScrollBar.maximum) {
+					users.scroller.verticalScrollBar.value = users.scroller.verticalScrollBar.maximum;
+				} else {
+					users.scroller.verticalScrollBar.value = visibleIndex * 95;
+				}
+				myTimer2.removeEventListener(TimerEvent.TIMER_COMPLETE,delayedItemClear2);
+			}
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>

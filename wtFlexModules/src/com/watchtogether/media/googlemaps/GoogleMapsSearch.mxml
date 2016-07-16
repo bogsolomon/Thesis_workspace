@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" 
+		   xmlns:controller="com.watchtogether.media.googlemaps.controller.*" 
+		   xmlns:medialist="com.watchtogether.ui.medialist.*" 
+		   creationComplete="controller.mapCreationComplete(event)"
+		   initialize="initializeHandler(event)">
+	
+	<fx:Declarations>
+		<controller:GoogleMapsSearchController id="controller" view="{this}"/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.MediaListClickEvent;
+			
+			import mx.events.FlexEvent;
+			
+			import spark.components.DropDownList;
+			import spark.events.IndexChangeEvent;
+			
+			public var sensorOptionsCombo:DropDownList;
+			public var sensorDataCombo:DropDownList;
+			
+			protected function initializeHandler(event:FlexEvent):void
+			{
+				sensorOptionsCombo = new DropDownList();
+				sensorOptionsCombo.id = "sensorOptionsCombo";
+				sensorOptionsCombo.enabled = true;
+				sensorOptionsCombo.selectedIndex = 0;
+				sensorOptionsCombo.width = 250;
+				sensorOptionsCombo.addEventListener(IndexChangeEvent.CHANGE, controller.sensorSelected);
+				
+				mediaList.addExtraElement(sensorOptionsCombo);
+				
+				sensorDataCombo = new DropDownList();
+				sensorDataCombo.id = "sensorDataCombo";
+				sensorDataCombo.enabled = true;
+				sensorDataCombo.selectedIndex = 0;
+				sensorDataCombo.width = 250;
+				sensorDataCombo.addEventListener(IndexChangeEvent.CHANGE, controller.sensorDataSelected);
+				
+				mediaList.addExtraElement(sensorDataCombo);
+				mediaList.hideSearch();
+			}
+			
+			private function mediaListItemClickHandler(event:MediaListClickEvent):void{
+				// no thumbnails for now
+			}
+			
+			protected function labelSearchResult(item:Object):String {
+				return item as String;
+			}
+		]]>
+	</fx:Script>
+	
+	<medialist:MediaList controller="{this.controller}" id="mediaList" 
+						 skinClass="com.watchtogether.ui.medialist.skin.MediaListSkin"
+						 itemClick="mediaListItemClickHandler(event)"
+						 searchLabelFunction="labelSearchResult"/>
+	
+	
+</mx:Module>

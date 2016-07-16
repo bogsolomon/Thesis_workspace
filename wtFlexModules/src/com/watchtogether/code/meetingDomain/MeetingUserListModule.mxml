@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:userlist="com.watchtogether.ui.userlist.*"
+		   xmlns:media="com.watchtogether.code.iface.media.*"
+		   layout="absolute" width="596" height="334"
+		   creationComplete="creationCompleteHandler(event)">
+	<fx:Declarations>
+		<media:SearchController id="controller"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.EventDispatcherSingleton;
+			import com.watchtogether.code.events.UserInfoEvent;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			
+			import mx.events.FlexEvent;
+			
+			import spark.events.TrackBaseEvent;
+			
+			private var shouldLoadUserList:Boolean = false;
+			
+			public function loadComplete():void
+			{
+				EventDispatcherSingleton.instance.addEventListener(UserInfoEvent.CONTACT_INFO_LOADED, contactInfoLoadedHandler);
+			}
+			
+			protected function contactInfoLoadedHandler(event:UserInfoEvent):void
+			{
+				if (userList == null) {
+					shouldLoadUserList = true;
+				} else {
+					for each (var user:AbstractUser in MainApplication.instance.login.getFriendsDetailedInfo()) {
+						userList.userListDataProvider.addItem(user);
+					}
+				}
+			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				if (shouldLoadUserList) {
+					for each (var user:AbstractUser in MainApplication.instance.login.getFriendsDetailedInfo()) {
+						userList.userListDataProvider.addItem(user);
+					}
+				}
+				userList.users.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_DRAG, listDragStart);
+				userList.users.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_RELEASE, listDragComplete);
+			}
+			
+			private function listDragStart(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = false;
+			}
+			
+			private function listDragComplete(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = true;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<userlist:UserList id="userList" label="Course Participants:" multipleGroups="{false}" skinClass="com.watchtogether.ui.userlist.skin.UserListSkin"
+					   width="100%"/>
+</mx:Module>

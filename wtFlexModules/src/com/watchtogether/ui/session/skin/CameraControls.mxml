@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  creationComplete="creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.mediaserver.WebcamBroadcastStream;
+			import com.watchtogether.ui.userpanel.UserPanelScript;
+			
+			import flash.media.Video;
+			
+			import mx.controls.Alert;
+			import mx.controls.VideoDisplay;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			
+			import spark.components.Button;
+			
+			[Bindable]
+			public var userPanel:UserPanelScript; 
+			[Bindable]
+			protected var webcamButton:Button = new Button();
+			protected var _webcamMaxButton:Button = new Button();
+			[Bindable]
+			protected var webcamButtonAlpha:Number = 0;
+			
+			private var video:VideoDisplay;
+			private var camera:Camera = Camera.getCamera();
+			
+			[Bindable]
+			public function get webcamMaxButton():Button
+			{
+				return _webcamMaxButton;
+			}
+
+			public function set webcamMaxButton(value:Button):void
+			{
+				_webcamMaxButton = value;
+			}
+
+			/**
+			 * Displays the user controls on mouse over envent.
+			 */
+			public function showControls():void
+			{
+				// Show user controls
+				this.controlsShow.end();
+				webcamButtonAlpha = 1;
+				this.controlsShow.play();
+			}
+			
+			/**
+			 * Hides the user controls on mouse out event.
+			 */
+			public function hideControls():void
+			{
+				// Hide user controls and search
+				this.controlsShow.end();
+				webcamButtonAlpha = 0;
+				this.controlsShow.play();
+				
+			}
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				webcamButton.label = "Enable WebCam";
+				webcamButton.verticalCenter = 0;
+				webcamButton.horizontalCenter = -20;
+				webcamButton.setStyle("fontSize", 9);
+				webcamButton.width = 90;
+				webcamButton.height = 20;
+				this.addElement(webcamButton);
+				
+				webcamMaxButton.label = "Maximize";
+				webcamMaxButton.verticalCenter = 0;
+				webcamMaxButton.horizontalCenter = 50;
+				webcamMaxButton.setStyle("fontSize", 9);
+				webcamMaxButton.width = 20;
+				webcamMaxButton.height = 20;
+				this.addElement(webcamMaxButton);
+				
+				webcamButton.addEventListener(MouseEvent.CLICK, enableWebCam);
+				webcamMaxButton.addEventListener(MouseEvent.CLICK, maximizeWebCam);
+				webcamMaxButton.enabled = false;
+			}
+
+			private function maximizeWebCam(event:MouseEvent):void{
+				MainApplication.instance.cameraMaximizedState = true;
+				MainApplication.instance.setPrimaryViewCamera();
+				
+				userPanel.removeElementAt(1);
+				userPanel.loadImage();
+				video.attachCamera(null);
+				video = null;
+				
+				webcamMaxButton.removeEventListener(MouseEvent.CLICK, maximizeWebCam);
+				webcamMaxButton.label = "Minimize";
+				webcamMaxButton.addEventListener(MouseEvent.CLICK, minimizeWebCam);
+			}
+			
+			private function minimizeWebCam(event:MouseEvent):void{
+				MainApplication.instance.cameraMaximizedState = false;
+				MainApplication.instance.removePrimaryViewCamera();
+				
+				video = new VideoDisplay();
+				video.width = 125;
+				video.height = 125;
+				video.horizontalCenter = 0;
+				video.verticalCenter = 0;
+				userPanel.removeElementAt(1);
+				userPanel.addElementAt(video, 1);
+				
+				video.attachCamera(camera);
+				
+				webcamMaxButton.removeEventListener(MouseEvent.CLICK, minimizeWebCam);
+				webcamMaxButton.label = "Maximize";
+				webcamMaxButton.addEventListener(MouseEvent.CLICK, maximizeWebCam);
+			}
+			
+			private function enableWebCam(event:MouseEvent):void{
+				video = new VideoDisplay();
+				video.width = 125;
+				video.height = 125;
+				video.horizontalCenter = 0;
+				video.verticalCenter = 0;
+				userPanel.removeElementAt(1);
+				userPanel.addElementAt(video, 1);
+				
+				if (camera == null) {
+					Alert.show("No camera available");
+				} else if (!camera.muted) {
+					video.attachCamera(camera);
+					
+					MainApplication.instance.webcamBroadcast = new WebcamBroadcastStream(MainApplication.instance.mediaServerConnection, 125, 125);
+					
+					webcamButton.label = "Disable WebCam";
+					webcamButton.removeEventListener(MouseEvent.CLICK, enableWebCam);
+					webcamButton.addEventListener(MouseEvent.CLICK, disableWebCam);
+					webcamMaxButton.enabled = true;
+				} else {
+					camera.addEventListener(StatusEvent.STATUS, handleEnableCameraStatus);
+					
+					Security.showSettings(SecurityPanel.PRIVACY);
+				}
+			}
+			
+			private function handleEnableCameraStatus(event:StatusEvent):void {
+				camera.removeEventListener(StatusEvent.STATUS, handleEnableCameraStatus);
+				
+				if (event.code == "Camera.Unmuted") {
+					video.attachCamera(camera);
+					MainApplication.instance.webcamBroadcast = new WebcamBroadcastStream(MainApplication.instance.mediaServerConnection, 125, 125);
+				} else {
+					Alert.show("Camera access forbidden. Not streaming");
+				}
+				webcamButton.label = "Disable WebCam";
+				webcamButton.removeEventListener(MouseEvent.CLICK, enableWebCam);
+				webcamButton.addEventListener(MouseEvent.CLICK, disableWebCam);
+				webcamMaxButton.enabled = true;
+			}
+			
+			private function disableWebCam(event:MouseEvent):void {
+				if (MainApplication.instance.cameraMaximizedState) {
+					MainApplication.instance.cameraMaximizedState = false;
+					MainApplication.instance.removePrimaryViewCamera();
+					webcamMaxButton.removeEventListener(MouseEvent.CLICK, minimizeWebCam);
+					webcamMaxButton.label = "Maximize";
+					webcamMaxButton.addEventListener(MouseEvent.CLICK, maximizeWebCam);
+				} else {
+					video.attachCamera(null);
+					video = null;
+				}
+				
+				if (MainApplication.instance.webcamBroadcast != null) {
+					MainApplication.instance.webcamBroadcast.attachCamera(null);
+					MainApplication.instance.webcamBroadcast.attachAudio(null);
+					MainApplication.instance.webcamBroadcast.close();
+					MainApplication.instance.webcamBroadcast = null;	
+				}
+					
+				webcamButton.label = "Enable WebCam";
+				webcamButton.removeEventListener(MouseEvent.CLICK, disableWebCam);
+				webcamButton.addEventListener(MouseEvent.CLICK, enableWebCam);
+				webcamMaxButton.enabled = false;
+				
+				userPanel.removeElementAt(1);
+				userPanel.loadImage();
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:Fade id="controlsShow" target="{this}" alphaTo="{webcamButtonAlpha}"/>
+	</fx:Declarations>
+</s:SkinnableContainer>

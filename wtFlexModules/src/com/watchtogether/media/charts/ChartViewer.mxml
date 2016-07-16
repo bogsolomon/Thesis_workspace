@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="900" height="428"
+		   xmlns:controllers = "com.watchtogether.media.charts.controller.*"
+		   xmlns:chartui = "com.watchtogether.media.charts.ui.*"
+		   verticalScrollPolicy="off"
+		   horizontalScrollPolicy="off"
+		   backgroundColor="#FFFFFF" creationComplete="controller.init()">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controllers:ChartViewerController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	
+	<!--mx:LineChart id="lineChart" showDataTips="true"
+				  width="570" height="100%" visible="false">
+		<mx:series>
+			<mx:LineSeries displayName="Line Chart" form="segment" sortOnXField="false" xField="yValue" yField="xValue">
+				<mx:lineStroke>
+					<s:SolidColorStroke color="0xBD2031" weight="2" alpha="0.8"/>
+				</mx:lineStroke>	
+			</mx:LineSeries>
+		</mx:series>
+		<mx:verticalAxis>	
+			<mx:LinearAxis id="ca" baseAtZero="true"
+				title="Time" direction="inverted" />
+		</mx:verticalAxis>
+		
+		<mx:horizontalAxis>
+			<mx:LinearAxis id="vertAxis" baseAtZero="true"
+						   title="Data" />
+		</mx:horizontalAxis>
+		
+		<mx:verticalAxisRenderers>
+			<mx:AxisRenderer axis="{ca}" canDropLabels="false" />
+		</mx:verticalAxisRenderers>
+		<mx:seriesFilters>
+			<fx:Array/>
+		</mx:seriesFilters>
+	</mx:LineChart-->
+</mx:Module>

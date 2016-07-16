@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+         
+  <display-name>Upload Servlet WebApp</display-name>
+  <context-param>
+  	<param-name>uploadDir</param-name>
+  	<param-value>/data/wtRed5_cloud_uploadfiles</param-value>		
+  </context-param>
+  <context-param>
+  	<param-name>wowzaHTTP</param-name>
+  	<param-value>http://localhost:5080/wtRed5_cld/fileInfo</param-value>		
+  </context-param>
+  
+  <context-param>
+    <param-name>quartz:shutdown-on-unload</param-name>
+  	<param-value>true</param-value>
+  </context-param>
+  <context-param>
+     <param-name>quartz:wait-on-shutdown</param-name>
+     <param-value>true</param-value>
+  </context-param>
+  <context-param>
+     <param-name>quartz:start-on-load</param-name>
+     <param-value>true</param-value>
+  </context-param>
+  
+  <servlet>
+  	<servlet-name>UploadServlet</servlet-name>
+  	<servlet-class>com.watchtogether.uploadServlet.UploadServlet</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>SWFDownloadServlet</servlet-name>
+  	<servlet-class>com.watchtogether.downloadServlet.SWFDownloadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>SWFDownloadServlet</servlet-name>
+  	<url-pattern>/download</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>UploadServlet</servlet-name>
+  	<url-pattern>/upload</url-pattern>
+  </servlet-mapping>
+  <listener>
+    <listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>
+  </listener>
+    <listener>
+     <listener-class>
+          org.quartz.ee.servlet.QuartzInitializerListener
+     </listener-class>
+  </listener>
+</web-app>

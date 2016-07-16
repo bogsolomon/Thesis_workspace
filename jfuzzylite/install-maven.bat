@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=bin\jfuzzylite.jar -DgroupId=jfuzzylite -DartifactId=jfuzzylite -Dversion=1.0 -Dpackaging=jar

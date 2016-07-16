@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="608" height="428"
+		   xmlns:controller="com.watchtogether.media.ustream.controller.*"
+		   xmlns:medialist="com.watchtogether.ui.medialist.*"
+		   creationComplete="controller.initialized()">
+		   <!--removed="controller.remove()"-->
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:UstreamViewerController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	<mx:SWFLoader width="100%" id="swfloader" horizontalCenter="0"/>
+</mx:Module>

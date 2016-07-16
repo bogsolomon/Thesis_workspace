@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<server url="rtmp://wtsrv1-rtmp.watch-together.com:1938/wtRed5_crs" loadbalancer="false"/>
+	<proxy url="http://wtsrv1.watch-together.com/proxy/proxy?url="/>
+	<fileServer downloadUrl="http://wtsrv1.watch-together.com/uploadServletCourse/download?file="
+		uploadUrl="http://wtsrv1.watch-together.com/uploadServletCourse/upload"/>
+	<domainLogin module="MoodleLoginModule">
+	</domainLogin>
+	<flashVars module="MoodleFVModule"/>
+	<userlist module="MoodleUserListModule"/>
+	<chat module="ChatViewer"/>
+	<settings module="SettingsViewer"/>
+	<maps>
+		<key value="ABQIAAAAnvrTFygj6CR_Uw5hlCD-IxR5Z53riCXn0USLxCHpL66XJ2VWHRSWFc-UcZiMp0luIvYSoNK719Cj-A"/>
+	</maps>
+	<components>
+		<component name="Flickr" 
+				icon="com/watchtogether/ui/dockBar/icons/flickr-icon-rfx.png" 
+				searchModule="com/watchtogether/media/flickr/FlickrSearch.swf" 
+				userControlModule="com/watchtogether/media/flickr/FlickrUserControl.swf" 
+				displayInfoModule="com/watchtogether/media/flickr/FlickrDisplayInfo.swf"
+				mediaViewerModule="com/watchtogether/media/flickr/FlickrViewer.swf"/>
+				
+		<component name="Youtube"
+				icon="com/watchtogether/ui/dockBar/icons/youtube-icon-rfx.png" 
+				searchModule="com/watchtogether/media/youtube/YoutubeSearch.swf" 
+				userControlModule="com/watchtogether/media/youtube/YoutubeUserControl.swf" 
+				displayInfoModule="com/watchtogether/media/youtube/YoutubeVideoInfo.swf"
+				mediaViewerModule="com/watchtogether/media/youtube/YoutubeViewer.swf">	
+			<initSearch type="random">
+				<value>real-time systems</value>
+				<value>robots</value>
+				<value>robotics</value>
+				<value>PID controllers</value>
+				<value>computer process control</value>
+			</initSearch>
+		</component>	
+		
+		<component name="WTDocs"
+				icon="com/watchtogether/ui/dockBar/icons/doc-icon-rfx.png" 
+				searchModule="com/watchtogether/media/wtdoc/DocsSearch.swf" 
+				userControlModule="com/watchtogether/media/wtdoc/DocsUserControl.swf" 
+				displayInfoModule="com/watchtogether/media/wtdoc/DocsDisplayInfo.swf" 
+				mediaViewerModule="com/watchtogether/media/wtdoc/DocsViewer.swf"/>
+				
+		<component name="UStream"
+				icon="com/watchtogether/ui/dockBar/icons/ustream_icon.png" 
+				searchModule="com/watchtogether/media/ustream/UstreamSearch.swf" 
+				userControlModule="com/watchtogether/media/ustream/UstreamUserControl.swf" 
+				displayInfoModule="com/watchtogether/media/ustream/UstreamDisplayInfo.swf"
+				mediaViewerModule="com/watchtogether/media/ustream/UstreamViewer.swf"/>
+	</components>
+</config>

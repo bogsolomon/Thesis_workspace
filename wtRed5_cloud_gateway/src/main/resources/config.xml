@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gateway-config address="192.168.35.31" stream-port="1935" app="wtRed5_cloud_gateway">
+	<peer-gateway address="192.168.35.35" port="5080" stream-port="1935" app="wtRed5_cloud_gateway"/>
+</gateway-config>

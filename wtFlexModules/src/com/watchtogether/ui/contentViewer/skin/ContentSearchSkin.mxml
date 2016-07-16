@@ -1,0 +1,31 @@
+<!--
+For Content Search
+-->
+
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+			 xmlns:s="library://ns.adobe.com/flex/spark">
+	
+	<!-- Host Component -->
+	<fx:Metadata>[HostComponent("com.watchtogether.ui.contentViewer.ContentSearch")]</fx:Metadata>
+
+	<!-- Skin States -->
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+	</s:states>
+
+	<!-- Background Space -->
+	<s:Rect top="0" bottom="0" left="0" right="0" radiusX="10">
+		<s:fill>
+			<s:SolidColor color="#FFFFFF" />
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="#000000" alpha="1" />
+		</s:stroke>
+	</s:Rect>
+	
+	<!-- Content Space -->
+	<s:Group id="contentGroup" top="1" bottom="1"
+			 left="1" right="1" />
+
+</s:SparkSkin>

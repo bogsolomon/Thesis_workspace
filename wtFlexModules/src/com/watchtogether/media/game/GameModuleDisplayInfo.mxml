@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute"
+		   width="424" height="20" 
+		   xmlns:controller="com.watchtogether.media.game.controller.*"
+		   horizontalScrollPolicy="off">
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.conversion.TextConverter;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:GameModuleDisplayInfoController view="{this}" id="controller"/>
+	</fx:Declarations>
+	<s:Group width="100%" height="100%">
+		<s:Rect width="100%" height="100%" radiusX="10">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry color="0x444444" />
+					<s:GradientEntry color="0x9E9E9E" />
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+	</s:Group>
+	<s:RichText id="descLabel"
+				textFlow="{TextConverter.importToFlow('Score', TextConverter.TEXT_FIELD_HTML_FORMAT)}"
+				horizontalCenter="0" verticalCenter="0" />
+</mx:Module>

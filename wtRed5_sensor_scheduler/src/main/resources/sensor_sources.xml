@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<systemConfig>
+	<capabilitiesRequestURLs>
+		<capabilitiesRequestURL url="http://opendap.co-ops.nos.noaa.gov/ioos-dif-sos/SOS?service=SOS&amp;request=GetCapabilities"
+			requestFormatURL="http://opendap.co-ops.nos.noaa.gov/ioos-dif-sos/SOS?service=SOS&amp;request=GetObservation&amp;version=1.0.0&amp;responseFormat=text%2Fxml%3Bschema%3D%22ioos/0.6.1%22">
+		</capabilitiesRequestURL>
+	</capabilitiesRequestURLs>
+	<measuredData>
+		<data>http://mmisw.org/ont/cf/parameter/air_temperature</data>
+		<data>http://mmisw.org/ont/cf/parameter/air_pressure</data>
+		<data>http://mmisw.org/ont/cf/parameter/sea_water_electrical_conductivity</data>
+		<data>http://mmisw.org/ont/cf/parameter/sea_water_salinity</data>
+		<data>http://mmisw.org/ont/cf/parameter/water_surface_height_above_reference_datum</data>
+		<data>http://mmisw.org/ont/cf/parameter/sea_water_temperature</data>
+		<data>http://mmisw.org/ont/cf/parameter/currents</data>
+		<data>http://mmisw.org/ont/cf/parameter/winds</data>
+	</measuredData>
+</systemConfig>

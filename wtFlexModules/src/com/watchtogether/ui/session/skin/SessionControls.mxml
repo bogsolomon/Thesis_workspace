@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  height="20" width="100%">
+	<fx:Declarations>
+		<!--s:Fade id="controlsShow" target="{this}" alphaTo="{controlsAlpha}"/-->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.iface.login.AbstractSession;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.code.mediaserver.WebcamReceiveStream;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			protected function leaveClickHandler(event:MouseEvent):void
+			{
+				MainApplication.instance.leaveSession();
+			}
+
+		]]>
+	</fx:Script>
+	<s:Group height="20" right="0" width="100%">
+		<s:Button label="Leave Session" id="leaveSession"
+			  click="leaveClickHandler(event)"
+			  fontWeight="bold" fontSize="11"
+			  top="0" horizontalCenter="0" height="20" width="100%">
+			<!--s:filters>
+				<s:DropShadowFilter distance="2" angle="45"/>
+			</s:filters-->
+		</s:Button>
+	</s:Group>
+</s:SkinnableContainer>

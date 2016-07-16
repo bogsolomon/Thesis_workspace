@@ -1,0 +1,5 @@
+host=localhost
+port=1099
+username=guest
+password=guest
+topicName=/topic/sosDataTopic

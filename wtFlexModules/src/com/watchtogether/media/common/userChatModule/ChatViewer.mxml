@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   layout="absolute" width="596" height="334"
+		   creationComplete="creationCompleteHandler(event)"
+		   xmlns:controller="com.watchtogether.media.common.userChatModule.controller.*">
+
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.iface.media.ChatMessage;
+			
+			import flashx.textLayout.conversion.TextConverter;
+			import flashx.textLayout.elements.Configuration;
+			import flashx.textLayout.elements.FlowElement;
+			import flashx.textLayout.elements.TextFlow;
+			import flashx.textLayout.events.CompositionCompleteEvent;
+			import flashx.textLayout.formats.TextDecoration;
+			import flashx.textLayout.formats.TextLayoutFormat;
+			
+			import mx.collections.ArrayCollection;
+			import mx.utils.StringUtil;
+			
+			import spark.events.TextOperationEvent;
+			import spark.events.TrackBaseEvent;
+			
+			private var cfg:Configuration;
+			
+			protected function sendChatBtn_clickHandler(event:MouseEvent):void
+			{
+				sendMessage();
+			}
+
+			protected function enterClickHandler(event:FlexEvent):void
+			{
+				sendMessage();
+			}
+			
+			private function sendMessage():void {
+				
+				
+				if (StringUtil.trim(watchTogetherVideoConfChatInputArea.text).length > 0) {
+				
+					var chatMsg:ChatMessage = new ChatMessage(MainApplication.instance.login.loggedInUser.first_name + " " +MainApplication.instance.login.loggedInUser.last_name
+						, watchTogetherVideoConfChatInputArea.text);
+					
+					watchTogetherVideoConfChatInputArea.text = "";
+					
+					addMessage(chatMsg);
+					
+					if (MainApplication.instance.sessionListDataProvider.length > 0) {
+						MainApplication.instance.mediaServerConnection.call("roomService.sendToAllInSession", null, "ChatMsgCollabRSOReceive", chatMsg);
+					}
+				}
+			}
+			
+			public function addMessage(chatMsg:Object):void {
+				var msgWithURLs:String = getUrlParsedMessage(chatMsg.user + ": "+ chatMsg.message);
+				
+				var myName:String = MainApplication.instance.login.loggedInUser.first_name + " " 
+						+ MainApplication.instance.login.loggedInUser.last_name;
+				
+				if (msgWithURLs.indexOf(myName) == 0) {
+					msgWithURLs = "<i><font color='#990000'>" + myName + "</font></i>" +
+						msgWithURLs.substr(myName.length);
+				} else {
+					var index:int = msgWithURLs.indexOf(":");
+					
+					msgWithURLs = "<i><font color='#0000FF'>" + msgWithURLs.substr(0, index) + "</font></i>" +
+						msgWithURLs.substr(index);
+				}
+				
+				var flow:TextFlow = TextConverter.importToFlow(msgWithURLs, TextConverter.TEXT_FIELD_HTML_FORMAT, cfg);
+				
+				mainChatAreaInstance.textFlow.addChild(flow.getChildAt(0));
+			}
+
+			private function getUrlParsedMessage(msg:String):String
+			{
+				//Display message and fix links
+				var isLink:RegExp = /(((http|https|ftp)\:\/\/)|(www\.))+(([a-zA-Z0-9\.-]+\.[a-zA-Z]{2,4})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(\/[a-zA-Z0-9%:\/-_\?\.'~]*)*/gi;
+
+				if(msg.match(isLink).length >= 1)
+				{
+					var t:String;
+					var addHttp:String;
+					for each (var match:String in msg.match(isLink))
+					{
+							match.search("www.")?(addHttp=""):(addHttp="http://");
+							t = msg.replace(match,("<a href='"+  match + "' target='_blank'>" + match + "</a>"));
+							msg = t;
+					}
+				}
+				return msg;
+			}
+			
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				cfg = TextFlow.defaultConfiguration;
+				
+				var normalFmt:TextLayoutFormat = new TextLayoutFormat(cfg.defaultLinkNormalFormat);
+				normalFmt.color = 0xFF0000; // red
+				normalFmt.textDecoration = TextDecoration.NONE;
+				
+				var hoverFmt:TextLayoutFormat = new TextLayoutFormat(cfg.defaultLinkHoverFormat);
+				hoverFmt.color = 0xFF00FF; // purple
+				hoverFmt.textDecoration = TextDecoration.UNDERLINE;
+				
+				var activeTLF:TextLayoutFormat = new TextLayoutFormat(cfg.defaultLinkActiveFormat);
+				activeTLF.color = 0x00FF00;
+				
+				cfg.defaultLinkNormalFormat = normalFmt;
+				cfg.defaultLinkHoverFormat = hoverFmt;
+				cfg.defaultLinkActiveFormat = activeTLF;
+				
+				var txt:String = "<a href='http://www.a.com' target='_blank'>http://www.a.com</a>";
+				
+				var childrenIndex:int = 0;
+				var childrenArray:ArrayCollection = new ArrayCollection();
+				
+				while (mainChatAreaInstance.textFlow.getChildAt(childrenIndex) != null) {
+					childrenArray.addItem(mainChatAreaInstance.textFlow.getChildAt(childrenIndex));
+					childrenIndex++;
+				}
+				
+				mainChatAreaInstance.textFlow = TextConverter.importToFlow(txt, TextConverter.TEXT_FIELD_HTML_FORMAT, cfg);
+				mainChatAreaInstance.textFlow.removeChildAt(0);
+				
+				for (childrenIndex=0;childrenIndex<childrenArray.length;childrenIndex++) {
+					mainChatAreaInstance.textFlow.addChild(childrenArray.getItemAt(childrenIndex) as FlowElement);
+				}
+				
+				mainChatAreaInstance.textFlow.addEventListener(CompositionCompleteEvent.COMPOSITION_COMPLETE, mainChatAreaInstance_updateCompleteHandler);
+				MainApplication.instance.dispatcher.addEventListener("sessionChanged", sessionChanged);
+				mainChatAreaInstance.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_DRAG, listDragStart);
+				mainChatAreaInstance.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_RELEASE, listDragComplete);
+				
+				if (MainApplication.instance.sessionListDataProvider.length > 0 && 
+					MainApplication.instance.sessionListDataProvider.getItemAt(0).accepted == true) {
+					sendChatBtn.enabled = true;
+					watchTogetherVideoConfChatInputArea.enabled = true;
+				}
+			}
+			
+			private function listDragStart(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = false;
+			}
+			
+			private function listDragComplete(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = true;
+			}
+
+			protected function mainChatAreaInstance_updateCompleteHandler(event:CompositionCompleteEvent):void
+			{
+				mainChatAreaInstance.scroller.verticalScrollBar.value = mainChatAreaInstance.scroller.verticalScrollBar.maximum;
+			}
+
+			private function sessionChanged(evt:Event):void {
+				this.dispatchEvent(new Event("sessionChanged"));
+			} 
+			
+			[Bindable(event="sessionChanged")]
+			private function getChatEnabled():Boolean {
+				 return (MainApplication.instance.sessionListDataProvider.length > 0 && 
+					MainApplication.instance.sessionListDataProvider.getItemAt(0).accepted == true);
+			}
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<controller:ChatController id="controller" view="{this}"/>
+	</fx:Declarations>
+	<!-- Display Components -->
+	<mx:VDividedBox width="100%" height="100%">
+		<s:TextArea
+			editable="false"
+			id="mainChatAreaInstance"
+			color="#2B4A70"
+			verticalScrollPolicy="on"
+			width="100%" height="{this.height-30}"
+			
+			/>
+		<s:HGroup>
+			<fx:Script>
+				<![CDATA[
+					import mx.events.FlexEvent;
+				]]>
+			</fx:Script>
+			<s:TextInput
+				height="100%"
+				width="{this.width - 60}"
+				fontWeight="normal"
+				fontSize="10"
+				fontFamily="Verdana"
+				color="#2B4A70" 
+				id="watchTogetherVideoConfChatInputArea"
+				bottom="2" left ="0" right="61"
+				enter="enterClickHandler(event)"
+				enabled="{getChatEnabled()}"/>
+			<s:Button 
+				id="sendChatBtn" 
+				label="Send" 
+				width="53" 
+				height="22" 
+				bottom="2" right="2"
+				click="sendChatBtn_clickHandler(event)"
+				enabled="{getChatEnabled()}"/>
+		</s:HGroup>
+	</mx:VDividedBox>
+</mx:Module>

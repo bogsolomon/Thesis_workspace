@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="424" height="40"
+		   xmlns:controller="com.watchtogether.media.youtube.controller.*">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.media.common.MaximizeMinimizeButtonSkin;
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<controller:YoutubeUserControlController id="controller" userControl="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+		<mx:DateFormatter id="dateFormatter" formatString="NN:SS" />
+	</fx:Declarations>
+	
+	<s:SkinnableContainer verticalCenter="0" horizontalCenter="0" height="35" id="bottombar">
+		
+		<s:ToggleButton id="playPauseButton" left="8" top="6" 
+						skinClass="spark.skins.spark.mediaClasses.normal.PlayPauseButtonSkin" 
+						focusIn="event.target.depth=1" focusOut="event.target.depth=0" 
+						click="controller.playPauseButton_click(event)"/>
+		
+		<s:ScrubBar id="slider" enabled="false" showDataTip="false" minimum="0" 
+					liveDragging="false" change="controller.slider_skip(event)" 
+					width="169" left="74" top="13" buttonMode="true" height="10"/>
+		
+		<s:Label id="curTimeLabel" width="42" height="14"  left="249" top="12"/>
+		
+		<s:Label id="maxTimeLabel" width="32" height="14"  left="286" top="12"/>
+		
+		<s:VolumeBar id="sound" enabled="false" buttonMode="true" 
+							   click="controller.muteButton_click(event)" left="335" top="6"
+							   change="controller.volumeChange(event)"
+							   minimum="0" maximum="100" value="100" rollOverOpenDelay="0"/>
+
+		<s:ToggleButton id="maximize" left="377" top="6" label="Maximized" click="controller.maximize_minimize(event)"
+				  skinClass="com.watchtogether.media.common.MaximizeMinimizeButtonSkin"
+				  focusIn="event.target.depth=1" focusOut="event.target.depth=0" />
+		
+	</s:SkinnableContainer>
+</mx:Module>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" xmlns:controller="com.watchtogether.media.googlemaps.controller.*">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:GoogleMapsUserControlController view="{this}" id="controller"  contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	
+	<s:ToggleButton id="maximize" left="377" top="6" label="Maximized" click="controller.maximize_minimize(event)"
+					skinClass="com.watchtogether.media.common.MaximizeMinimizeButtonSkin"
+					focusIn="event.target.depth=1" focusOut="event.target.depth=0" />
+	
+</mx:Module>

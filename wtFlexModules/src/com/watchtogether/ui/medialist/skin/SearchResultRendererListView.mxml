@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer 
+	xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	width="100%" creationComplete="init(event)">
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+		<s:State name="hovered" />
+		<s:State name="selected" />
+	</s:states>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.events.MediaListClickEvent;
+			import com.watchtogether.ui.contentViewer.ContentViewer;
+			
+			import mx.core.FlexGlobals;
+			import mx.managers.ToolTipManager;
+			
+			[Bindable]
+			private var initHeight:Number;
+			
+			[Bindable]																
+			private var _data:Object;			
+			
+			private function init(event:Event):void{
+				event.stopPropagation();
+				if(_data.subtitle == null && _data.thumbnailUrl == null)
+				{
+					mainHorizontalGroup.removeElement(ThumbNail);
+					verticalGroup.removeElement(Label2);
+					mainHorizontalGroup.height = 25;
+					height = 25;
+					initHeight = height;
+				}
+			}
+			
+			private function mouseClicked(event:MouseEvent):void {
+				var mainApp:main = (FlexGlobals.topLevelApplication as main);
+				
+				for (var i:int=0;i<mainApp.numElements;i++) {
+					if (mainApp.getElementAt(i) is ContentViewer) {
+						(mainApp.getElementAt(i) as ContentViewer).hideSearchPanel();
+					}
+				}
+				
+				dispatchEvent(new MediaListClickEvent(MediaListClickEvent.ITEM_CLICK,true,false,_data));
+			}
+			
+			[Bindable]
+			override public function get data():Object{
+				
+				return _data;
+			}
+			
+			override public function set data( inObject:Object):void{
+				if (inObject){	
+					_data = inObject;
+				}
+			}
+			
+			private function startRendering():void{
+				initHeight = height;
+				ToolTipManager.hideDelay = 3000;
+			}
+		]]>
+	</fx:Script>
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="#FFFFFF" />
+				<s:GradientEntry color="#C8C8C8" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	<s:HGroup
+		id="mainHorizontalGroup"
+		click="mouseClicked(event)"
+		doubleClickEnabled="false"
+		width="100%" 
+		height="70"
+		verticalAlign="middle"
+		paddingTop="5"
+		paddingBottom="5"
+		paddingLeft="10"
+		paddingRight="10"
+		creationComplete="startRendering()"
+		horizontalAlign="left"
+		gap="10">
+		<mx:Image 
+			width="48"
+			height="48"
+			id="ThumbNail" 		
+			source="{_data.thumbnailUrl}"
+			toolTip="Title: {_data.title}"
+			visible="{_data.thumbnailUrl != null}"
+			trustContent="true" smoothBitmapContent="true">
+			<mx:filters>
+				<s:DropShadowFilter color="#424242" alpha="0.5" />
+			</mx:filters>
+		</mx:Image>
+		<s:VGroup id="verticalGroup" horizontalAlign="left">
+			<s:Label id="Label" color="#084B8A" fontWeight="bold"
+				fontSize="14" text="{_data.title}"/>
+			<s:Label id="Label2" color="#585858"
+				fontSize="12" text="{_data.subtitle}" visible="{_data.subtitle != null}"
+				maxDisplayedLines="2" width="491" height="100%"/>
+		</s:VGroup>
+	</s:HGroup>
+</s:ItemRenderer>

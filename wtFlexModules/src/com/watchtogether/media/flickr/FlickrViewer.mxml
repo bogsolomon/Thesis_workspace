@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute"
+		   xmlns:controller="com.watchtogether.media.flickr.controller.*"
+		   xmlns:components="com.watchtogether.media.flickr.ui.slideshow.*"
+		   width="608" height="428"
+		   creationComplete="controller.init()">
+		   <!--removedFromStage="controller.remove()"-->
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controller:FlickrViewerController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	
+	
+	<!-- setting dataProvider programatically from controller since wouldn't bind properly -->
+	<components:Slideshow id="slideShow"
+						  width="100%" top="6" bottom="6"
+						  dataProvider="{controller.pictures}" 
+						/>
+
+	<!-- currentIndex="{controller.selectedIndex}" -->
+	
+	<!--<mx:Image 
+		id="picture" source=""
+		scaleContent="false"
+		maintainAspectRatio="true"
+
+		complete="picture.visible=true; picture.percentHeight=100; picture.percentWidth=100" 
+		horizontalAlign="center"
+		verticalAlign="middle"
+	/>-->
+	
+	<!--{_currentPicture.source}
+	hideEffect="{fadeOut}" 
+	showEffect="{fadeIn}" 
+	
+	-->
+	
+	
+</mx:Module>

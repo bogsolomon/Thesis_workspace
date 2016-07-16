@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="632" height="428"
+		   xmlns:controllers = "com.watchtogether.media.wtdoc.controller.*"
+		   xmlns:docui = "com.watchtogether.media.doc.ui.*"
+		   xmlns:controls="com.watchtogether.ui.spinner.controls.*"
+		   initialize="controller.init()"
+		   verticalScrollPolicy="off"
+		   horizontalScrollPolicy="off"
+		   backgroundColor="#000000">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controllers:DocsViewerController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+	</fx:Declarations>
+	<s:Scroller id="scroller" width="632" height="428" x="0" y="0">
+		<s:Group id="scrollGroup">
+			<controls:Spinner id="spinner" tickColor="#999999" 
+							  size="30" numTicks="12" tickWidth="3" speed="1000" fadeSpeed="600"
+							  horizontalCenter="0" verticalCenter="0"/>
+		</s:Group>
+	</s:Scroller>
+</mx:Module>

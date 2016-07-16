@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration> 
+    <contextName>${finalName}</contextName>
+    <jmxConfigurator contextName="${finalName}" />    
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <File>log/${finalName}.log</File>
+        <Append>false</Append>
+        <BufferedIO>false</BufferedIO>
+        <ImmediateFlush>true</ImmediateFlush>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</Pattern>
+        </layout>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

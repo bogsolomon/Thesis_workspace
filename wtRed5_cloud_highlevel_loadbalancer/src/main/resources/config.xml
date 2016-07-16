@@ -1,0 +1,4 @@
+<config maxReturnLB="1">
+	<loadBalancer host="172.30.3.1" port="1935" app="wtRed5_ac_brain"></loadBalancer>
+	<loadBalancer host="172.30.6.5" port="1935" app="wtRed5_ac_brain"></loadBalancer>
+</config>

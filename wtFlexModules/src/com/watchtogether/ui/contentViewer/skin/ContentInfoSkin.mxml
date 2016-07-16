@@ -1,0 +1,34 @@
+<!--
+For Content User Controls
+-->
+
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+			 xmlns:s="library://ns.adobe.com/flex/spark">
+	
+	<!-- Host Component -->
+	<fx:Metadata>[HostComponent("com.watchtogether.ui.contentViewer.ContentInfo")]</fx:Metadata>
+	<fx:Declarations>
+		<!-- Glow Fx Layer -->
+		<s:GlowFilter color="#FFFFFF" />
+	</fx:Declarations>
+	<!-- Skin States -->
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+	</s:states>
+	
+	<!-- Backgound Layer -->
+	<s:Rect top="0" bottom="0" left="0" right="0" radiusX="10">
+		<s:fill>
+			<s:SolidColor color="#FFFFFF" alpha="{hostComponent.bgAlpha}" />
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="#FFFFFF" alpha="{hostComponent.borderAlpha}" />
+		</s:stroke>
+	</s:Rect>
+	
+	<!-- Content Layer -->
+	<s:Group id="contentGroup" top="1" bottom="1" left="1" right="1">
+	</s:Group>
+	
+</s:SparkSkin>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	verticalScrollPolicy="off" horizontalScrollPolicy="off" width="100%" height="100%" creationComplete="init()">
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.Application;
+
+			//private var myMessgeFormatter:RSOMessageFormater;
+			[Bindable]
+			private var _currentPicture:SlideshowImage = new SlideshowImage();
+			
+			private var _pictures:ArrayCollection;
+			
+			private function init():void{
+			//		myMessgeFormatter = new RSOMessageFormater();
+			}
+			
+			private function switchPictures():void
+			{
+				fadeIn.end();
+                fadeOut.end();
+                picture.visible = false;            
+            }
+			
+			public function updateCurrentPicture():void
+			{
+				_currentPicture = new SlideshowImage();
+				_currentPicture.source=_pictures[_currentIndex].url;
+		
+			}
+			
+			public function set dataProvider(value:ArrayCollection):void
+			{
+				picture.visible = false;
+				_pictures = value;
+				_currentIndex = 0;
+				updateCurrentPicture();
+			}
+			
+			public function get dataProvider():ArrayCollection
+			{
+				return _pictures;
+			}
+			
+			private var _currentIndex:int = 0;
+			public function set currentIndex(value:int):void
+			{
+				_currentIndex = value;
+				switchPictures();
+			}
+			
+			public function get currentIndex():int
+			{
+				return _currentIndex;
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<mx:Fade id="fadeOut" duration="400" alphaFrom="1.0" alphaTo="0.0" effectEnd="updateCurrentPicture()"/>
+    <mx:Fade id="fadeIn" duration="400" alphaFrom="0.0" alphaTo="1.0"/>
+
+    
+    <mx:ProgressBar id="progressBar" source="{picture}" visible="{progressBar.percentComplete != 100}"  horizontalCenter="0" verticalCenter="0"/>
+    <mx:Image id="picture" source="{_currentPicture.source}"  scaleContent="true"  maintainAspectRatio="true"
+        hideEffect="{fadeOut}" 
+        showEffect="{fadeIn}" 
+        complete="picture.visible=true; picture.percentHeight=100; picture.percentWidth=100" 
+        horizontalAlign="center" verticalAlign="middle"
+		trustContent="true" smoothBitmapContent="true"/>
+</mx:Canvas>

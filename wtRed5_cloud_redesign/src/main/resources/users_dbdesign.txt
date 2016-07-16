@@ -1,0 +1,20 @@
+create database wtu_${wt_version}; 
+connect wtu_${wt_version};
+
+CREATE TABLE APPLICATION_USERS (
+  user_id varchar(64) NOT NULL,
+  user_name varchar(100), 
+  age int(11) default NULL,
+  sex int(2) default NULL,
+  location varchar(200) default NULL,
+  PRIMARY KEY  (user_id)
+) ENGINE=InnoDB;
+
+
+create table APPLICATION_USER_CONFIG (
+	id int(11) NOT NULL auto_increment, 
+	user_id varchar(64) NOT NULL, 
+	mediaApi varchar(30) NOT NULL, 
+	PRIMARY KEY  (id), 
+	CONSTRAINT FOREIGN KEY (user_id) REFERENCES APPLICATION_USERS (user_id))
+ENGINE=InnoDB ;

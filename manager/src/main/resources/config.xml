@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manager-config>
+	<managed-server port="5080" app="wtRed5_cld"></managed-server>
+	<management-group group_name="red5_management" file_location="jgroups_config.xml"></management-group>
+	<control>
+		<sensor class="com.watchtogether.autonomic.selforg.red5.manager.components.Red5HTTPSensor"/>
+		<filter class="com.watchtogether.autonomic.selforg.red5.manager.components.BandwithToPacketFilter">
+			<param name="PACKET_SIZE" value="482"/>
+		</filter>
+		<model class="com.watchtogether.autonomic.selforg.red5.manager.components.LeakyBucketModel">
+			<param name="MAX_BUCKET_LEVEL" value="100"/>
+			<param name="PACKETS_PER_STREAM" value = "622"/>
+			<param name="REFILL_RATE" value = "20"/>
+		</model>
+		<coordinator class="com.watchtogether.autonomic.selforg.red5.manager.components.Red5ServerCoordinator">
+			<param name="CONTROL_LOOP_PERIOD" value="30000"/>
+		</coordinator>
+		<estimator class="com.watchtogether.autonomic.selforg.red5.manager.components.ThresholdEstimator">
+			<param name="LOWER_THRESHOLD" value="20"/>
+			<param name="HIGH_THRESHOLD" value="40"/>
+		</estimator>
+		<decisionMaker class="com.watchtogether.autonomic.selforg.red5.manager.components.ClientPolicyDecisionMaker">
+			<param name="LOWER_THRESHOLD_CHANGE_COUNT" value="5"/>
+			<param name="HIGH_THRESHOLD_CHANGE_COUNT" value="2"/>
+		</decisionMaker>
+		<actuator class="com.watchtogether.autonomic.selforg.red5.manager.components.ClientPolicyActuator">
+		</actuator>
+		<adaptor class="com.watchtogether.autonomic.selforg.red5.manager.components.ElectionAdaptor">
+			<param name="ADD_THRESHOLD" value="0.25"/>
+			<param name="REMOVE_THRESHOLD" value="0.75"/>
+			<param name="ADAPTOR_LOOP_PERIOD" value="30000"/>
+		</adaptor>
+	</control>
+</manager-config>

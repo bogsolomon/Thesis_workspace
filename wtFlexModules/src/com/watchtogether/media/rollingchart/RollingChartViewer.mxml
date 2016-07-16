@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="552" height="428"
+		   xmlns:controllers = "com.watchtogether.media.rollingchart.controller.*"
+		   xmlns:chartui = "com.watchtogether.media.rollingchart.ui.*"
+		   xmlns:bttc="com.betterthantomorrow.components.*"
+		   xmlns:gauge="com.betterthantomorrow.components.gauge.*"
+		   verticalScrollPolicy="off"
+		   horizontalScrollPolicy="off"
+		   backgroundColor="#FFFFFF" creationComplete="controller.init()">
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+						
+			private function numberLabelFunction(item:Object, column:GridColumn):String {    
+				var result:String;
+				result = gridFormatter.format(item.value);
+				return result;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<controllers:RollingChartViewerController id="controller" view="{this}" contentViewer="{MainApplication.instance.contentViewer}"/>
+		<mx:NumberFormatter precision="1" id="formatter" rounding="nearest"/>
+		<s:NumberFormatter id="gridFormatter"
+						   fractionalDigits="2" 
+						   decimalSeparator="."
+						   groupingSeparator=","
+						   useGrouping="true"
+						   negativeNumberFormat="0"
+						   />
+	</fx:Declarations>
+	<!--mx:LineChart id="lineChart" showDataTips="true"
+				  width="632" height="100%" visible="true"
+				  dataProvider="{controller.chartData}">
+		<mx:series>
+			<mx:LineSeries displayName="Line Chart" form="segment" sortOnXField="false" xField="yValue" yField="xValue">
+				<mx:lineStroke>
+					<s:SolidColorStroke color="0xBD2031" weight="2" alpha="0.8"/>
+				</mx:lineStroke>	
+			</mx:LineSeries>
+		</mx:series>
+		<mx:verticalAxis>	
+			<mx:LinearAxis id="ca" baseAtZero="true"
+						   title="Time" direction="inverted" />
+		</mx:verticalAxis>
+		
+		<mx:verticalAxisRenderers>
+			<mx:AxisRenderer axis="{ca}" canDropLabels="false" />
+		</mx:verticalAxisRenderers>
+		<mx:seriesFilters>
+			<fx:Array/>
+		</mx:seriesFilters>
+	</mx:LineChart-->
+	
+	<!--<mx:Image width="221" height="428" id="chart" x="205" />-->
+	
+<!--	<s:Group x="0" y="0" width="632" height="100%" id="hidingWindow">
+		<s:Rect width="100%" height="100%">
+			<s:fill>
+				<s:LinearGradient rotation="90">
+					<s:GradientEntry color="#FFFFFF" alpha="1" />	
+					<s:GradientEntry color="#FFFFFF" alpha="1" />
+				</s:LinearGradient>
+			</s:fill>
+		</s:Rect>
+	</s:Group>-->
+	
+	
+	<s:Image source="@Embed(source='assets/embedded/rollingchart/drillinggraph-clean.png')" x="0" />
+	<!-- tried to get it to load it from com/watchtogether/media/rollingchart/images/drillinggraph-clean.png
+	via firebug, saw this was getting hit:
+	wtHB/com/watchtogether/media/rollingchart/images/drillinggraph-clean.png
+	instead of:
+	wtHB/code/com/watchtogether/media/rollingchart/images/drillinggraph-clean.png
+	since unclear how to make s:Image find the /code/com, embedding it for now (and moving to embedded assets)
+	the drillinggraph-filled.png is loaded dynamically from the /images via the RollingChartSearchController.png
+	-->
+	
+	<s:Group x="0" y="0">
+		<s:mask>
+			<s:Group x="0" y="0" width="221" height="100" id="hidingWindow">
+				<s:Rect left="0" right="0" top="0" bottom="0" radiusX="10" radiusY="10">
+					<s:fill>
+						<s:SolidColor color="#FFFFFF" alpha="1"/>
+						
+					</s:fill>
+				</s:Rect>
+			</s:Group>
+		</s:mask>
+		
+		<mx:Image id="chart"/>		
+	</s:Group>
+	
+	<bttc:Gauge id="gauge1" 
+				diameter="140" width="140"  
+				x="230" y="0"
+				minValue="1"  maxValue="100" value="{5.0}" valueFormatter="{formatter}"
+				bigTicks="9" smallTicks="45" showMinMax="true" showValue="true" />
+	<bttc:Gauge id="gauge2" 
+				diameter="140" width="140"  
+				x="380" y="0"
+				minValue="1"  maxValue="10" value="{5.0}" valueFormatter="{formatter}"
+				bigTicks="9" smallTicks="45" showMinMax="true" showValue="true" />
+	<bttc:Gauge id="gauge3" 
+				diameter="140" width="135"  
+				x="230" y="150"
+				minValue="1"  maxValue="10" value="{5.0}" valueFormatter="{formatter}"
+				bigTicks="9" smallTicks="45" showMinMax="true" showValue="true" />
+	<bttc:Gauge id="gauge4" 
+				diameter="140" width="135"  
+				x="380" y="150"
+				minValue="1"  maxValue="10" value="{5.0}" valueFormatter="{formatter}"
+				bigTicks="9" smallTicks="45" showMinMax="true" showValue="true" />
+	
+	<s:DataGrid dataProvider="{controller.dataGridProvider}" x="230" y="293" width="310">
+		<s:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="name" headerText="Name"/>
+				<s:GridColumn dataField="value" headerText="Value" labelFunction="numberLabelFunction"/>
+			</s:ArrayList>
+		</s:columns>
+	</s:DataGrid>
+</mx:Module>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+         
+  <display-name>Archetype Created Web Application</display-name>
+  
+  <context-param>
+    <param-name>quartz:shutdown-on-unload</param-name>
+  	<param-value>true</param-value>
+  </context-param>
+  <context-param>
+     <param-name>quartz:wait-on-shutdown</param-name>
+     <param-value>true</param-value>
+  </context-param>
+  <context-param>
+     <param-name>quartz:start-on-load</param-name>
+     <param-value>true</param-value>
+  </context-param>
+  
+  <servlet>
+  	<servlet-name>SchedulerServlet</servlet-name>
+  	<servlet-class>com.watchtogether.sensor.scheduler.SchedulerServlet</servlet-class>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+  	<servlet-name>SensorSearchServlet</servlet-name>
+  	<servlet-class>com.watchtogether.sensor.scheduler.SensorSearchServlet</servlet-class>
+  	<load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>SchedulerServlet</servlet-name>
+  	<url-pattern>/scheduler</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>SensorSearchServlet</servlet-name>
+  	<url-pattern>/search</url-pattern>
+  </servlet-mapping>
+  
+  <listener>
+     <listener-class>
+          org.quartz.ee.servlet.QuartzInitializerListener
+     </listener-class>
+  </listener>
+</web-app>

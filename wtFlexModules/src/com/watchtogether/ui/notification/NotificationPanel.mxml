@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  skinClass="com.watchtogether.ui.notification.skin.NotificationSkin"
+					  creationComplete="creationCompleteHandler(event)">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.NotificationClickEvent;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			import com.watchtogether.code.iface.notification.NotificationObject;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.utils.ObjectUtil;
+			
+			private var timer:Timer = new Timer(5000);
+			
+			[Bindable]
+			private var _notificationList:ArrayCollection = new ArrayCollection();
+			
+			public function addNotification(origUser:AbstractUser, msg:String, clickable:Boolean, color:uint):void {
+				if (origUser.first_name != "Loading") {
+					var notifObj:NotificationObject = new NotificationObject();
+					notifObj.user = origUser;
+					notifObj.msg = msg;
+					notifObj.time = new Date();
+					notifObj.clickable = clickable;
+					notifObj.borderColor = color;
+					_notificationList.addItem(notifObj);
+					
+					resizeNotificationPanel();
+				}
+			}
+			
+			public function removeNotification(origUser:AbstractUser, msg:String, clickable:Boolean, color:uint):void {
+				for each (var notifObjList:NotificationObject in _notificationList) {
+					if (notifObjList.user.uid == origUser.uid &&
+						notifObjList.msg == msg &&
+						notifObjList.clickable == clickable &&
+						notifObjList.borderColor == color) {
+						_notificationList.removeItemAt(_notificationList.getItemIndex(notifObjList));
+						break;
+					}	
+				}
+				
+				resizeNotificationPanel();
+			}
+			
+			private function resizeNotificationPanel():void {
+				var nrItems:Number = _notificationList.length;
+				
+				var requiredHeight:Number =  _notificationList.length * 95;
+				var nrCols:Number = 0;
+				var requiredWidth:Number = 0;
+				
+				if (requiredHeight > MainApplication.instance.viewerHeight) {
+					nrCols = Math.ceil(requiredHeight / MainApplication.instance.viewerHeight);
+					nrCols = Math.max(nrCols, 2);
+					requiredWidth = nrCols * 205;
+					requiredHeight = MainApplication.instance.viewerHeight;
+				} else {
+					requiredWidth = 205;
+				}
+					
+				this.width = requiredWidth + 5;
+				this.height = requiredHeight;
+				this.x = this.parent.width - this.width;
+				this.y = this.parent.height - this.height;
+			}
+			
+			public function get notificationList():ArrayCollection {
+				return _notificationList;
+			}
+			
+
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				timer.addEventListener(TimerEvent.TIMER, handleTimeEvent);
+				timer.start();
+			}
+			
+			protected function handleTimeEvent(evt:TimerEvent):void {
+				var now:Date = new Date();
+				var notifObj:NotificationObject = null;
+				for (var i:int =0; i<_notificationList.length;i++) {
+					notifObj = _notificationList.getItemAt(i) as NotificationObject;
+					if (now.getTime() - notifObj.time.getTime() > 15000) {
+						_notificationList.removeItemAt(i);
+						if (notifObj.clickable) {
+							MainApplication.instance.dispatcher.dispatchEvent(new NotificationClickEvent(NotificationClickEvent.DECLINE_CLICK, notifObj));
+						}
+					}
+				}
+				
+				resizeNotificationPanel();
+			}
+
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>

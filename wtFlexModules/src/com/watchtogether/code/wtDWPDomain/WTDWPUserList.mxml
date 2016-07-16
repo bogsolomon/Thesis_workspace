@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:userlist="com.watchtogether.ui.userlist.*"
+		   xmlns:media="com.watchtogether.code.iface.media.*"
+		   layout="absolute" width="596" height="334">
+	<fx:Declarations>
+		<media:SearchController id="controller"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.watchtogether.code.MainApplication;
+			import com.watchtogether.code.events.EventDispatcherSingleton;
+			import com.watchtogether.code.events.GroupChangeEvent;
+			import com.watchtogether.code.events.UserInfoEvent;
+			import com.watchtogether.code.iface.login.AbstractGroup;
+			import com.watchtogether.code.iface.login.AbstractUser;
+			
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.IndexChangedEvent;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TrackBaseEvent;
+			
+			private var _dispatcher:EventDispatcher = null;
+			
+			public function get dispatcher():EventDispatcher
+			{
+				return _dispatcher;
+			}
+			
+			public function set dispatcher(value:EventDispatcher):void
+			{
+				_dispatcher = value;
+			}
+			
+			protected function contactInfoChangedHandler(event:UserInfoEvent):void
+			{
+				// TODO Auto-generated method stub
+			}
+			
+			
+			protected function contactInfoLoadedHandler(event:UserInfoEvent):void
+			{
+				loadUsers();
+				userList.users.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_DRAG, listDragStart);
+				userList.users.scroller.verticalScrollBar.addEventListener(TrackBaseEvent.THUMB_RELEASE, listDragComplete);
+			}
+			
+			private function listDragStart(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = false;
+			}
+			
+			private function listDragComplete(evt:TrackBaseEvent):void {
+				controller.allowSearchOutHide = true;
+			}
+			
+			public function loadComplete():void
+			{
+				EventDispatcherSingleton.instance.addEventListener(UserInfoEvent.CONTACT_INFO_LOADED, contactInfoLoadedHandler);
+				EventDispatcherSingleton.instance.addEventListener(UserInfoEvent.CONTACT_INFO_CHANGED, contactInfoChangedHandler);
+			}
+			
+			private function loadUsers():void {
+				userList.userListDataProvider.refresh();
+				userList.userListDataProvider.removeAll();
+				
+				for each (var user:AbstractUser in MainApplication.instance.login.getFriendsDetailedInfo()) {
+					userList.userListDataProvider.addItem(user);
+				}
+				
+				userList.userListDataProvider.refresh();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<userlist:UserList id="userList" label="Students" multipleGroups="{false}" skinClass="com.watchtogether.ui.userlist.skin.UserListSkin"
+					   width="100%"/>
+</mx:Module>
