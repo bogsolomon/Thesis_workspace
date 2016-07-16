@@ -3,8 +3,8 @@
     xmlns:lang="http://www.springframework.org/schema/lang"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
     http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.0.xsd">
-	
-	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+
+        <bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                   <value>/WEB-INF/red5-web.properties</value>
@@ -12,11 +12,11 @@
           </property>
     </bean>
 
-	
-	<bean id="web.context" class="org.red5.server.Context"
+
+        <bean id="web.context" class="org.red5.server.Context"
                 autowire="byType" />
-	
-	<bean id="web.scope" class="org.red5.server.scope.WebScope">
+
+        <bean id="web.scope" class="org.red5.server.scope.WebScope">
       <property name="server" ref="red5.server" />
       <property name="parent" ref="global.scope" />
       <property name="context" ref="web.context" />
@@ -25,6 +25,6 @@
       <property name="virtualHosts" value="${webapp.virtualHosts}" />
     </bean>
 
-	<bean id="wtRed5.handler"
+        <bean id="wtRed5.handler"
             class="com.watchtogether.accesscontrol.WatchTogetherAccessControl"/>
 </beans>

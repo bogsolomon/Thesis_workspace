@@ -1,7 +1,7 @@
 <config xmlns="urn:org:jgroups" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.0.xsd">
-	<TCP bind_port="7800" loopback="false" singleton_name="tcp_transport"/>
-    <TCPGOSSIP initial_hosts="172.30.3.1[5555]"
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/JGroups-3.0.xsd">
+    <TCP bind_addr="match-interface:eth0.*" bind_port="7800" loopback="false" singleton_name="tcp_transport"/>
+    <TCPGOSSIP initial_hosts="red5-jgroups[5555]"
                num_initial_members="2"/>
     <MERGE2 max_interval="10000" min_interval="2000"/>
     <FD_SOCK/>
@@ -14,5 +14,5 @@
                    max_bytes="400000"/>
     <pbcast.GMS print_local_addr="true" join_timeout="3000"
                 view_bundling="true"/>
-	<CENTRAL_LOCK num_backups="1"/>
+        <CENTRAL_LOCK num_backups="1"/>
 </config>
