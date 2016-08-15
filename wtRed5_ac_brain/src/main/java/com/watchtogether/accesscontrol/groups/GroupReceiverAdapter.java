@@ -1,5 +1,6 @@
 package com.watchtogether.accesscontrol.groups;
 
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -7,6 +8,7 @@ import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
+import org.jgroups.stack.IpAddress;
 
 import com.watchtogether.common.ClientPolicyMessage;
 import com.watchtogether.server.cloud.client.messages.gms.ServerApplication;
@@ -41,13 +43,20 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 			ClientPolicyMessage clMsg = (ClientPolicyMessage) msg.getObject();
 			System.out.println("received ClientPolicyMessage from "
 					+ msg.getSrc() + ": " + clMsg.getAccept());
+			IpAddress address = null;
+			try {
+				address = new IpAddress(clMsg.getIp(), clMsg.getPort());
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 			if (clMsg.getAccept()) {
 				GroupManager.getInstance().serverAccepting(
-						addressToServer.get(msg.getSrc()));
+						addressToServer.get(address));
 			} else {
 				GroupManager.getInstance().serverRejecting(
-						addressToServer.get(msg.getSrc()));
+						addressToServer.get(address));
 			}
 		}
 
@@ -78,6 +87,7 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 	}
 
 	public void addServerPeer(Address src, ServerApplication server) {
+		System.out.println("Adding server: "+src);
 		addressToServer.put(src, server);
 	}
 

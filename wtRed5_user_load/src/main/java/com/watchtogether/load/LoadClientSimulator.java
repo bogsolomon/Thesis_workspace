@@ -39,8 +39,8 @@ public class LoadClientSimulator extends RTMPClient implements IPendingServiceCa
 	
 	private StreamPublisher streamPub;
 	
-	private static String STREAM_FILE = "d:/Tests/out_long_640.mp4";
-	/*private static String STREAM_FILE = "E:/Camera/2006PicsAndMovies/filme/film7.avi";*/
+	/*private static String STREAM_FILE = "d:/Tests/out_long_640.avi";*/
+	private static String STREAM_FILE = "E:/Camera/2006PicsAndMovies/filme/merged2.avi";
 	
 	public void setFriendIDs(String[] friendIds) {
 		this.friendIds = friendIds;
