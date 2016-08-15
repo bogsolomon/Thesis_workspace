@@ -1,13 +1,11 @@
 package com.watchtogether.accesscontrol.groups;
 
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
-import org.jgroups.View;
 import org.jgroups.stack.IpAddress;
 
 import com.watchtogether.common.ClientPolicyMessage;
@@ -17,7 +15,7 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 
 	private static GroupReceiverAdapter instance = null;
 
-	private ConcurrentHashMap<Address, ServerApplication> addressToServer = new ConcurrentHashMap<Address, ServerApplication>(
+	private ConcurrentHashMap<String, ServerApplication> addressToServer = new ConcurrentHashMap<String, ServerApplication>(
 			16, 0.75f, 1);
 
 	private GroupReceiverAdapter() {
@@ -43,13 +41,7 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 			ClientPolicyMessage clMsg = (ClientPolicyMessage) msg.getObject();
 			System.out.println("received ClientPolicyMessage from "
 					+ msg.getSrc() + ": " + clMsg.getAccept());
-			IpAddress address = null;
-			try {
-				address = new IpAddress(clMsg.getIp(), clMsg.getPort());
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			String address = clMsg.getIp() + ":" +clMsg.getPort();
 
 			if (clMsg.getAccept()) {
 				GroupManager.getInstance().serverAccepting(
@@ -72,7 +64,7 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 		 */
 	}
 
-	public void viewAccepted(View new_view) {
+	/*public void viewAccepted(View new_view) {
 		List<Address> addresses = new_view.getMembers();
 
 		for (Address add : addressToServer.keySet()) {
@@ -85,13 +77,13 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 			}
 		}
 	}
-
+*/
 	public void addServerPeer(Address src, ServerApplication server) {
-		System.out.println("Adding server: "+src);
-		addressToServer.put(src, server);
+		System.out.println("Adding server: "+server);
+		addressToServer.put(server.getHost()+":"+server.getPort(), server);
 	}
 
-	public void removeServer(Address src) {
-		addressToServer.remove(src);
+	public void removeServer(Address src, ServerApplication server) {
+		addressToServer.remove(server.getHost()+":"+server.getPort());
 	}
 }

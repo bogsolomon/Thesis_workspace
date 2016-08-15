@@ -243,7 +243,7 @@ public class GroupManager implements IGroupManager {
 			ServerApplication server) {
 		servers.values().remove(server);
 		acceptingServer.remove(server);
-		GroupReceiverAdapter.getInstance().removeServer(src);
+		GroupReceiverAdapter.getInstance().removeServer(src, server);
 	}
 
 	@Override
