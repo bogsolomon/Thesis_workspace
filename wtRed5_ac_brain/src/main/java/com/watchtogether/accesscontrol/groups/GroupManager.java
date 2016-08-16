@@ -72,7 +72,7 @@ public class GroupManager implements IGroupManager {
 			
 			managementServergroupchannel = new JChannel(url);
 			managementServergroupchannel.setDiscardOwnMessages(true);
-			managementServergroupchannel.setReceiver(GroupReceiverAdapter.getInstance());
+			managementServergroupchannel.setReceiver(GroupReceiverAdapter.getManagementInstance());
 			if (envPort != null)
 			{
 				((TCP) managementServergroupchannel.getProtocolStack().getTransport())
@@ -154,11 +154,15 @@ public class GroupManager implements IGroupManager {
 	}
 
 	public void serverAccepting(ServerApplicationMessage server) {
+		logger.info("Adding accepting servers: " + server);
 		acceptingServer.add(server);
+		logger.info("Accepting servers: " + acceptingServer);
 	}
 
 	public void serverRejecting(ServerApplicationMessage server) {
+		logger.info("Removing accepting servers: " + server);
 		acceptingServer.remove(server);
+		logger.info("Accepting servers: " + acceptingServer);
 	}
 
 	public static GroupManager getInstance() {
@@ -234,6 +238,7 @@ public class GroupManager implements IGroupManager {
 		}
 		
 		acceptingServer.add(server);
+		logger.info("Accepting servers: " + acceptingServer);
 		
 		GroupReceiverAdapter.getInstance().addServerPeer(src, server);
 	}
@@ -243,6 +248,7 @@ public class GroupManager implements IGroupManager {
 			ServerApplication server) {
 		servers.values().remove(server);
 		acceptingServer.remove(server);
+		logger.info("Accepting servers: " + acceptingServer);
 		GroupReceiverAdapter.getInstance().removeServer(src, server);
 	}
 

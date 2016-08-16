@@ -1,12 +1,12 @@
 package com.watchtogether.accesscontrol.groups;
 
-import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.jgroups.Address;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
-import org.jgroups.stack.IpAddress;
+import org.jgroups.View;
 
 import com.watchtogether.common.ClientPolicyMessage;
 import com.watchtogether.server.cloud.client.messages.gms.ServerApplication;
@@ -14,20 +14,33 @@ import com.watchtogether.server.cloud.client.messages.gms.ServerApplication;
 public class GroupReceiverAdapter extends ReceiverAdapter {
 
 	private static GroupReceiverAdapter instance = null;
+	private static GroupReceiverAdapter manageInstance = null;
 
-	private ConcurrentHashMap<String, ServerApplication> addressToServer = new ConcurrentHashMap<String, ServerApplication>(
+	private static ConcurrentHashMap<String, ServerApplication> addressToServer = new ConcurrentHashMap<String, ServerApplication>(
+			16, 0.75f, 1);
+	private static ConcurrentHashMap<Address, ServerApplication> jgroupsAddressToServer = new ConcurrentHashMap<Address, ServerApplication>(
 			16, 0.75f, 1);
 
-	private GroupReceiverAdapter() {
-
+	private boolean isManage = false;
+	
+	private GroupReceiverAdapter(boolean isManage) {
+		this.isManage  = isManage;
 	}
 
 	public static GroupReceiverAdapter getInstance() {
 		if (instance == null) {
-			instance = new GroupReceiverAdapter();
+			instance = new GroupReceiverAdapter(false);
 		}
 
 		return instance;
+	}
+	
+	public static GroupReceiverAdapter getManagementInstance() {
+		if (manageInstance == null) {
+			manageInstance = new GroupReceiverAdapter(true);
+		}
+
+		return manageInstance;
 	}
 
 	public void receive(Message msg) {
@@ -64,12 +77,17 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 		 */
 	}
 
-	/*public void viewAccepted(View new_view) {
+	public void viewAccepted(View new_view) {
+		if (isManage)
+		{
+			// we don't process view changes for the management channel
+			return;
+		}
 		List<Address> addresses = new_view.getMembers();
 
-		for (Address add : addressToServer.keySet()) {
+		for (Address add : jgroupsAddressToServer.keySet()) {
 			if (!addresses.contains(add)) {
-				ServerApplication server = addressToServer.get(add);
+				ServerApplication server = jgroupsAddressToServer.get(add);
 				System.out.println("removing server " + server.getHost()
 						+ server.getPort() + server.getApp() + " as stale");
 				GroupManager.getInstance().removeServerPeer(add, server);
@@ -77,10 +95,11 @@ public class GroupReceiverAdapter extends ReceiverAdapter {
 			}
 		}
 	}
-*/
+
 	public void addServerPeer(Address src, ServerApplication server) {
 		System.out.println("Adding server: "+server);
 		addressToServer.put(server.getHost()+":"+server.getPort(), server);
+		jgroupsAddressToServer.put(src, server);
 	}
 
 	public void removeServer(Address src, ServerApplication server) {
