@@ -6,4 +6,5 @@
 	<avgSessionSize>4</avgSessionSize>
 	<avgUsersStreamingPerSession>2</avgUsersStreamingPerSession>
 	<avgSessionActionDelay>25000</avgSessionActionDelay>
+	<sessionCount>1</sessionCount>
 </config>

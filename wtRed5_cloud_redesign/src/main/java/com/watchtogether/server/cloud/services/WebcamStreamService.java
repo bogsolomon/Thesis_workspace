@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.red5.client.net.rtmp.ClientExceptionHandler;
 import org.red5.server.api.IClient;
 import org.red5.server.api.Red5;
 import org.red5.server.api.scope.IBasicScope;
@@ -229,14 +230,28 @@ public class WebcamStreamService extends ServiceArchetype {
 				+ streamName);
 
 		StreamingProxy sp = new StreamingProxy();
-		sp.init();
 		sp.setHost(server.getHost());
 		sp.setPort(server.getPort());
 		sp.setApp(server.getApp());
-
+		sp.init();
+		sp.setConnectionClosedHandler(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Publish connection has been closed, source will be disconnected");
+            }
+        });
+		sp.setExceptionHandler(new ClientExceptionHandler() {
+            @Override
+            public void handleException(Throwable throwable) {
+                throwable.printStackTrace();
+                logger.info("Exception in proxy: " + throwable);
+            }
+        });
+		
 		IBroadcastStream stream = coreServer.getBroadcastStream(scope,
 				streamName);
 		IBroadcastScope bsScope = this.getBroadcastScope(scope, streamName);
+		logger.info("Found broadcast scope: " + bsScope);
 		bsScope.subscribe(sp, null);
 
 		sp.start(stream.getPublishedName(), IClientStream.MODE_LIVE,

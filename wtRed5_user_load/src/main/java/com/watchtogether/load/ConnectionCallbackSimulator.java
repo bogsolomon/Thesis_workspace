@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.watchtogether.load.conn.close.ConnectionClosedHandler;
+import com.watchtogether.server.cloud.client.messages.RoomLeaveMessage;
+import com.watchtogether.server.cloud.client.messages.flash.RebalanceMessage;
 import com.watchtogether.server.cloud.client.messages.flash.RoomBroadcast;
 import com.watchtogether.server.cloud.client.messages.flash.RoomInvite;
 import com.watchtogether.server.cloud.client.messages.flash.RoomInviteReply;
@@ -195,8 +197,8 @@ public class ConnectionCallbackSimulator{
 		log.error("Client's Server {}: Time difference between clients sendMediaMessage {}", new Object[]{client.getServerHost(), (time - sendTime)});
 	}
 	
-	public void clientLeft(Integer uid) {
-		log.warn("User {} received information that user {} has left", new Object[]{client.getID(), uid});
+	public void clientLeft(RoomLeaveMessage message) {
+		log.warn("User {} received information that user {} has left", new Object[]{client.getID(), message.getClientId()});
 	}
 	
 	private void streamStarted(int uid) {
@@ -215,6 +217,19 @@ public class ConnectionCallbackSimulator{
 		log.warn("User {} received information that user {} streamStoped", new Object[]{client.getID(), message.getClientId()});
 		
 		client.stopPlayStream(message.getClientId()+"_stream");
+	}
+	
+	public void rebalance(RebalanceMessage message) {
+		log.warn("User {} received rebalance {}:{}/{}", new Object[]{client.getID(), message.getHost(), message.getPort(), message.getApp()});
+		
+		if (client.isStreaming()) {
+			client.stopStreaming();
+			log.warn("Client {} is rebalanced and was streaming", new Object[]{client.getID()});
+		}
+		
+		client.setRebalanceMessage(message);
+		client.setConnectionClosedHandler(null);
+		client.disconnect();
 	}
 	
 	public void onBWCheck(Map<String, Object> statsValues) {

@@ -7,6 +7,8 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.NetworkInterface;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.Enumeration;
 import java.util.Set;
@@ -171,10 +173,13 @@ public class ServerApplicationMessage implements Serializable {
 			{
 				port = new Integer(envPort);
 			}
-			String envHost = System.getenv("red5_ip");
-			if (envHost != null && !envHost.equals("localhost"))
-			{
-				host = envHost;
+			String hostname = new String(Files.readAllBytes(Paths.get("/hostname"))).trim();
+			if (hostname.equals("cloud1")) {
+				host = "172.30.3.1"; 
+			} else if (hostname.equals("cloud2")) {
+				host = "172.30.4.2"; 
+			} else if (hostname.equals("cloud5")) {
+				host = "172.30.6.5"; 
 			}
 			app = props.getProperty("app");
 		} catch (FileNotFoundException e) {

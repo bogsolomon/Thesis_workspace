@@ -14,6 +14,7 @@ import org.red5.server.api.scope.IScope;
 
 import com.watchtogether.server.cloud.client.FlashClient;
 import com.watchtogether.server.cloud.client.messages.UserStatus;
+import com.watchtogether.server.cloud.client.messages.flash.RebalanceMessage;
 import com.watchtogether.server.cloud.client.messages.flash.UserStatusChangeMessage;
 import com.watchtogether.server.cloud.gateway.groups.GatewayGroupManager;
 import com.watchtogether.server.cloud.internal.groups.InternalGroupManager;
@@ -328,5 +329,16 @@ public class UserStateService extends ServiceArchetype {
 		strBuff.append("</networkStats>");
 
 		return strBuff.toString();
+	}
+
+	public void rebalanceClients(int size, String host, Integer port, String app) {
+		int count = 0;
+		
+		for (FlashClient client : connectedClients.values()) {
+			if (count % size == 0) {
+				client.sendMessage(new RebalanceMessage(host, port, app));
+			}
+			count++;
+		}
 	}
 }

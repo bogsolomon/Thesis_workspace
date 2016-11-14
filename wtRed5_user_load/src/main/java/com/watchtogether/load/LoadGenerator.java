@@ -26,6 +26,7 @@ public class LoadGenerator extends Thread{
 	private static String SESSION_ACTION_DELAY_TAG = "avgSessionActionDelay";
 	private static String USER_LIFETIME_TAG = "userLifetime";
 	private static String DISTRIBUTION_TYPE_TAG = "distributionType";
+	private static String SESSION_COUNT_TAG = "sessionCount";
 	
 	private static String POISSON_DISTRIBUTION = "poisson";
 	
@@ -35,6 +36,8 @@ public class LoadGenerator extends Thread{
 	private int streamSizeValue = 0;
 	private int sessionDelayValue = 0;
 	private int userLifetimeValue = 0;
+	private int sessionNumber = 0;
+	
 	
 	public static int POISSON_MEAN = 10;
 
@@ -43,12 +46,10 @@ public class LoadGenerator extends Thread{
 	protected static Logger log = LoggerFactory.getLogger(LoadGenerator.class);
 	
 	private List<LoadSessionSimulator> sessions = new ArrayList<LoadSessionSimulator>();
-
-	private Long sessionNumber = 1l;
 	
-	private static long startUserValue = 4;
+	/*private static long startUserValue = 4;
 	private static long endUserValue = 6;
-	private static long userIncrement = 2;
+	private static long userIncrement = 2;*/
 	
 	public static void main(String[] args) {
 		File f = null;
@@ -63,18 +64,18 @@ public class LoadGenerator extends Thread{
 		String port = args[1];
 		String application = args[2];
 		
-		for (long users = startUserValue; users <= endUserValue; users+=userIncrement) {
-			log.error("TEST STARTED with user count: " +users+ " ---------------------------------------------------------------------");
+		/*for (long users = startUserValue; users <= endUserValue; users+=userIncrement) {*/
 			LoadGenerator loadGen = new LoadGenerator();
 			
 			loadGen.loadConfig(f);
+			log.error("TEST STARTED with user count: " +loadGen.userCountValue+ " ---------------------------------------------------------------------");
 						
-			loadGen.generatePoissonLoad(server, port, application, users);
+			loadGen.generateLoad(server, port, application);
 			
 			loadGen.run();
 			
-			log.error("TEST ENDED with user count: " +users+ " ---------------------------------------------------------------------");
-		}
+			log.error("TEST ENDED with user count: " +loadGen.userCountValue+ " ---------------------------------------------------------------------");
+		/*}*/
 	}
 
 	public void loadConfig(File f) {
@@ -103,8 +104,11 @@ public class LoadGenerator extends Thread{
 			Element distribution = (Element)doc.getElementsByTagName(DISTRIBUTION_TYPE_TAG).item(0);
 			distributionType = distribution.getTextContent();
 			
+			Element sessionCount = (Element)doc.getElementsByTagName(SESSION_COUNT_TAG).item(0);
+			sessionNumber = Integer.valueOf(sessionCount.getTextContent());
+			
 			log.warn("User generation data: size={}; distribution={}; lifetime={}.", new Object[]{userCountValue, distributionType, userLifetimeValue});
-			log.warn("Session generation data: size={}; distribution={}.", new Object[]{sessionSizeValue, distributionType});
+			log.warn("Session generation data: size={}; distribution={}, count={}.", new Object[]{sessionSizeValue, distributionType, sessionNumber});
 			log.warn("Stream generation data: size={}.", new Object[]{streamSizeValue});
 			log.warn("Session delay generation data: size={}; distribution={}.", new Object[]{sessionDelayValue, distributionType});
 		} catch (ParserConfigurationException e) {
@@ -116,7 +120,7 @@ public class LoadGenerator extends Thread{
 		}
 	}
 
-	public void generatePoissonLoad(String server, String port, String application, Long users) {
+	public void generateLoad(String server, String port, String application) {
 		
 		
 		int sessionCount = 0;
@@ -125,9 +129,12 @@ public class LoadGenerator extends Thread{
 		
 		int usersGenerated = 0;
 				
-		while (usersGenerated < users*sessionNumber ) {
-			//Long size = rand.nextPoisson(new Double(sessionSizeValue));
-			Long size = users;
+		while (usersGenerated < userCountValue*sessionNumber ) {
+			// Long size = rand.nextPoisson(new Double(sessionSizeValue));
+			Integer size = userCountValue;
+			if (distributionType.equals("poisson")) {
+				size = (int) rand.nextPoisson(new Double(sessionSizeValue));
+			}
 			
 			if (size < 2) {
 				continue;
@@ -198,7 +205,7 @@ public class LoadGenerator extends Thread{
 		}		
 		
 		try {
-			Thread.sleep(70*30*1000);
+			Thread.sleep(70*60*1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

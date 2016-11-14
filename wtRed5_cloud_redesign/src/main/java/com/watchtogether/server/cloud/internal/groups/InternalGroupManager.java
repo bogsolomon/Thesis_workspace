@@ -123,9 +123,25 @@ public class InternalGroupManager implements IGroupManager {
 	@Override
 	public void addServerPeer(Address addr, ServerApplication server) {
 		InternalGroupReceiverAdapter.getInstance().addServerPeer(addr, server);
-
+		boolean readded = false;
+		
 		if (servers.contains(server)) {
 			servers.remove(server);
+			readded = true;
+		}
+		
+		for (String clientId : server.getExistingClientIds())
+		{
+			if (!personalIdToClient.containsKey(clientId)) {
+				addClient(clientId, server);
+			}
+		}
+		
+		if (!readded && coreServer != null && coreServer.getUserStateService() != null && server != null)
+		{
+			logger.info("Rebalancing clients");
+			// one is us, one is the new server - so add 2
+			coreServer.getUserStateService().rebalanceClients(servers.size() + 2, server.getHost(), server.getPort(), server.getApp());
 		}
 
 		servers.add(server);

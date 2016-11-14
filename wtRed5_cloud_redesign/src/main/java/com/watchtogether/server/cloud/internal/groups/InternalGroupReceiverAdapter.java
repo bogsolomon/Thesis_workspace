@@ -55,7 +55,7 @@ public class InternalGroupReceiverAdapter extends ReceiverAdapter {
 		}
 		
 		GMSMessage message = (GMSMessage) msg.getObject();
-
+		
 		message.handleInternalGMSMessage(msg, InternalGroupManager.getInstance());
 	}
 

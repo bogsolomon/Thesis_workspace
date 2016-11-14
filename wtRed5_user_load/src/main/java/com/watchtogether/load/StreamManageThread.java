@@ -22,7 +22,7 @@ public class StreamManageThread extends Thread {
 	public void run() {
 		while (run) {
 			try {
-				Thread.sleep(180000);
+				Thread.sleep(120000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

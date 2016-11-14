@@ -1,29 +1,3 @@
-package com.watchtogether.server.cloud.services.util;
-
-/*
- * 
- * Author: Bogdan Solomon
- * 
- * This class is copied from the Red5 equivalent class in order to expose the
- * rtmpClient variable for statistic gathering
- * 
- * RED5 Open Source Flash Server - http://code.google.com/p/red5/
- * 
- * Copyright (c) 2006-2010 by respective authors (see below). All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or modify it under the 
- * terms of the GNU Lesser General Public License as published by the Free Software 
- * Foundation; either version 2.1 of the License, or (at your option) any later 
- * version. 
- * 
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY 
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along 
- * with this library; if not, write to the Free Software Foundation, Inc., 
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA 
- */
 /*
  * RED5 Open Source Flash Server - https://github.com/Red5/
  * 
@@ -41,6 +15,8 @@ package com.watchtogether.server.cloud.services.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.watchtogether.server.cloud.services.util;
 
 import java.io.IOException;
 import java.util.Map;
@@ -82,7 +58,7 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
 
     private static Logger log = LoggerFactory.getLogger(StreamingProxy.class);
 
-    private ConcurrentLinkedQueue<IMessage> frameBuffer = new ConcurrentLinkedQueue<IMessage>();
+    private ConcurrentLinkedQueue<IMessage> frameBuffer = new ConcurrentLinkedQueue<>();
 
     private String host;
 
@@ -96,16 +72,16 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
 
     private String publishName;
 
-    private int streamId;
+    private Number streamId;
 
     private String publishMode;
 
     private final Semaphore lock = new Semaphore(1, true);
+    
+    private long time = -1, prevTime = -1, prevWrittern = -1, prevRead = -1;
 
     // task timer
     private static Timer timer;
-
-    private long time = -1, prevTime = -1, prevWrittern = -1, prevRead = -1;
 
     public void init() {
         rtmpClient = new RTMPClient();
@@ -144,10 +120,12 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
         rtmpClient.createStream(this);
     }
 
+    @Override
     public void onPipeConnectionEvent(PipeConnectionEvent event) {
         log.debug("onPipeConnectionEvent: {}", event);
     }
 
+    @Override
     public void pushMessage(IPipe pipe, IMessage message) throws IOException {
         if (isPublished() && message instanceof RTMPMessage) {
             RTMPMessage rtmpMsg = (RTMPMessage) message;
@@ -158,6 +136,7 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
         }
     }
 
+    @Override
     public void onOOBControlMessage(IMessageComponent source, IPipe pipe, OOBControlMessage oobCtrlMsg) {
         log.debug("onOOBControlMessage: {}", oobCtrlMsg);
     }
@@ -182,6 +161,7 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
         this.app = app;
     }
 
+    @Override
     public void onStreamEvent(Notify notify) {
         log.debug("onStreamEvent: {}", notify);
         ObjectMap<?, ?> map = (ObjectMap<?, ?>) notify.getCall().getArguments()[0];
@@ -198,9 +178,10 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
         }
     }
 
+    @Override
     public void resultReceived(IPendingServiceCall call) {
         String method = call.getServiceMethodName();
-        log.debug("resultReceived:> {}", method);
+        log.debug("resultReceived: {}", method);
         if ("connect".equals(method)) {
             //rtmpClient.releaseStream(this, new Object[] { publishName });
             timer.schedule(new BandwidthStatusTask(), 2000L);
@@ -209,8 +190,8 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
         } else if ("createStream".equals(method)) {
             setState(StreamState.PUBLISHING);
             Object result = call.getResult();
-            if (result instanceof Integer) {
-                streamId = ((Integer) result).intValue();
+            if (result instanceof Number) {
+                streamId = (Number) result;
                 log.debug("Publishing: {}", state);
                 rtmpClient.publish(streamId, publishName, publishMode, this);
             } else {
@@ -278,9 +259,9 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
             createStream();
         }
 
-    }	
-	
-	public double[] getAvgBandwidth() {
+    }
+    
+    public double[] getAvgBandwidth() {
 		double[] avgBw = new double[2];
 		
 		time = System.currentTimeMillis();
@@ -298,4 +279,5 @@ public class StreamingProxy implements IPushableConsumer, IPipeConnectionListene
 		
 		return avgBw;
 	}
+
 }

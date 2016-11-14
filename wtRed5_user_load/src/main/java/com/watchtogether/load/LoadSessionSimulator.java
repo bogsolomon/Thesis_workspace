@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.watchtogether.load.conn.close.ACBrainConnectionClosedHandler;
+import com.watchtogether.load.conn.close.ConnectionClosedHandler;
 import com.watchtogether.load.conn.close.ReconnectRunnable;
 
 public class LoadSessionSimulator extends Thread{
@@ -265,10 +266,42 @@ public class LoadSessionSimulator extends Thread{
 		client.connect(server, Integer.valueOf(port), connectionParams, client, null);
 		
 		try {
-			Thread.sleep(1500);
+			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void serverRedirect(LoadClientSimulator client, String server, Integer port, String app) {
+		log.warn("Redirecting id {} to {}:{}/{}", new Object[]{client.getID(), server, port, app});
+		
+		LoadClientSimulator oldClient = client;
+		
+		client = new LoadClientSimulator();
+		client.setID(oldClient.getID());
+		client.setFriendIDs(oldClient.getFriendIDs());
+		client.setLifetime(oldClient.getLifetimeValue());
+		client.setSessionManager(oldClient.getSessionManager());
+		client.setSleeping(false);
+		client.setStreaming(false);
+		
+		client.setServerHost("rtmp://"+server+":"+port+"/"+app);
+		
+		Map<String, Object> connectionParams = client.makeDefaultConnectionParams(server, Integer.valueOf(port), app);
+		
+		Object[] connectParams = new Object[5];
+		connectParams[0] = ""+client.getID();
+		connectParams[1] = "User "+client.getID();
+		connectParams[2] = "male";
+		connectParams[3] = "Canada";
+		connectParams[4] = "1-Jan-1980";
+		
+		client.setServiceProvider(this);
+		client.setConnectionClosedHandler(new ConnectionClosedHandler(client));
+		client.setServiceProvider(new ConnectionCallbackSimulator(client));
+		//client.setExceptionHandler(new SimClientExceptionHandler(client));
+		
+		client.connect(server, Integer.valueOf(port), connectionParams, client, connectParams);
 	}
 
 	public synchronized void markUserConnected(LoadClientSimulator loadClientSimulator) {
@@ -362,12 +395,12 @@ public class LoadSessionSimulator extends Thread{
 	}
 
 	public long getStreamCount() {
-		//return rand.nextPoisson(streamSizeValue);
+		return streamSizeValue;
 		/*if (this.id == 1)
 			return 3;
 		else
 			return 0;*/
-		return 2;
+		//return 2;
 	}
 
 	public void addInviteList(String uid) {

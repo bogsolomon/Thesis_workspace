@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.watchtogether.load.streams.StreamPlay;
 import com.watchtogether.load.streams.StreamPublisher;
+import com.watchtogether.server.cloud.client.messages.flash.RebalanceMessage;
 
 public class LoadClientSimulator extends RTMPClient implements IPendingServiceCallback {
 
@@ -30,6 +31,7 @@ public class LoadClientSimulator extends RTMPClient implements IPendingServiceCa
 	private LoadSessionSimulator loadSessionSimulator;
 	private boolean host = false;
 	private boolean streaming = false;
+	private RebalanceMessage message = null;
 	
 	private Map<String, StreamPlay> playingStreams = new HashMap<String, StreamPlay>();
 	
@@ -40,7 +42,7 @@ public class LoadClientSimulator extends RTMPClient implements IPendingServiceCa
 	private StreamPublisher streamPub;
 	
 	/*private static String STREAM_FILE = "d:/Tests/out_long_640.avi";*/
-	private static String STREAM_FILE = "E:/Camera/2006PicsAndMovies/filme/merged2.avi";
+	private static String STREAM_FILE = "D:/bsolomon/data/merged2.avi";
 	
 	public void setFriendIDs(String[] friendIds) {
 		this.friendIds = friendIds;
@@ -243,5 +245,13 @@ public class LoadClientSimulator extends RTMPClient implements IPendingServiceCa
 		}
 		
 		loadSessionSimulator.decrementStreamRecvSize();
+	}
+
+	public void setRebalanceMessage(RebalanceMessage message) {
+		this.message = message;
+	}
+	
+	public RebalanceMessage getRebalanceMessage() {
+		return message;
 	}
 }

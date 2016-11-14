@@ -1,0 +1,1 @@
+java -cp "wtRed5_user_load-0.0.1-SNAPSHOT.jar;lib/*" com.watchtogether.load.LoadGenerator 172.30.4.2 1935 wtRed5_ac_brain
